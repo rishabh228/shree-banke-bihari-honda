@@ -30,7 +30,7 @@ class Bike < ApplicationRecord
   scope :by_category, ->(category) { where(category: category) if category.present? }
 
   def self.ransackable_attributes(_auth_object = nil)
-    %w[category name engine mileage power]
+    %w[category name engine mileage power status slug]
   end
 
   def self.ransackable_associations(_auth_object = nil)

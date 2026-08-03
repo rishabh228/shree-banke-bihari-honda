@@ -1,0 +1,45 @@
+<div class="flex min-h-screen items-center justify-center px-4 py-12">
+  <div class="w-full max-w-md">
+    <div class="mb-8 text-center">
+      <%= link_to root_path, class: "inline-block" do %>
+        <p class="font-display text-2xl font-bold text-honda-dark">Shree Banke Bihari Honda</p>
+        <p class="mt-1 text-sm text-gray-500">Staff Admin Portal</p>
+      <% end %>
+    </div>
+
+    <div class="card p-8 shadow-lg">
+      <h1 class="font-display mb-6 text-xl font-semibold text-honda-dark">Sign in</h1>
+
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-5" }) do |f| %>
+        <div>
+          <%= f.label :email, class: "mb-1 block text-sm font-medium text-gray-700" %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input-field w-full", placeholder: "admin@shreebankebiharihonda.com" %>
+        </div>
+
+        <div>
+          <%= f.label :password, class: "mb-1 block text-sm font-medium text-gray-700" %>
+          <%= f.password_field :password, autocomplete: "current-password", class: "input-field w-full" %>
+        </div>
+
+        <% if devise_mapping.rememberable? %>
+          <div class="flex items-center gap-2">
+            <%= f.check_box :remember_me, class: "rounded border-gray-300 text-honda-red focus:ring-honda-red" %>
+            <%= f.label :remember_me, class: "text-sm text-gray-600" %>
+          </div>
+        <% end %>
+
+        <div class="pt-2">
+          <%= f.submit "Sign in", class: "btn-primary w-full cursor-pointer" %>
+        </div>
+      <% end %>
+
+      <div class="mt-6 text-center">
+        <%= render "devise/shared/links" %>
+      </div>
+    </div>
+
+    <p class="mt-6 text-center text-sm text-gray-500">
+      <%= link_to "← Back to website", root_path, class: "hover:text-honda-red" %>
+    </p>
+  </div>
+</div>

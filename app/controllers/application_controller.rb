@@ -6,6 +6,8 @@ class ApplicationController < ActionController::Base
 
   allow_browser versions: :modern
 
+  layout :set_layout
+
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :load_settings
 
@@ -35,5 +37,11 @@ class ApplicationController < ActionController::Base
 
   def after_sign_in_path_for(resource)
     resource.super_admin? || resource.manager? || resource.sales_executive? || resource.service_advisor? ? admin_root_path : root_path
+  end
+
+  def set_layout
+    return "devise" if devise_controller?
+
+    "application"
   end
 end
