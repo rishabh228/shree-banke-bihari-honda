@@ -48,7 +48,7 @@ gem "pundit"
 
 # Search & pagination
 gem "ransack"
-gem "pagy", "~> 9.3"
+gem "pagy", "~> 43.6"
 
 # Slugs & charts
 gem "friendly_id", "~> 5.5"
