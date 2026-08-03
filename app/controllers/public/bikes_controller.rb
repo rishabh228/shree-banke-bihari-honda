@@ -23,7 +23,7 @@ module Public
     private
 
     def ransack_params
-      params.fetch(:q, {}).permit(:category_eq, :name_cont, :engine_cont)
+      SearchQuery::PermittedParams.call(Bike, params[:q])
     end
   end
 end

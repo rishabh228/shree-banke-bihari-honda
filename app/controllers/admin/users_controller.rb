@@ -7,7 +7,7 @@ module Admin
     def index
       authorize User
 
-      @q = policy_scope(User).ransack(params[:q])
+      @q = policy_scope(User).ransack(ransack_query_for(User))
       @pagy, @users = pagy(@q.result.order(:name))
     end
 

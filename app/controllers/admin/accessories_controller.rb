@@ -7,7 +7,7 @@ module Admin
     def index
       authorize Accessory
 
-      @q = policy_scope(Accessory).ransack(params[:q])
+      @q = policy_scope(Accessory).ransack(ransack_query_for(Accessory))
       @pagy, @accessories = pagy(@q.result.order(created_at: :desc))
     end
 

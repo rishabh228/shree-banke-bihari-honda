@@ -2,12 +2,12 @@
 
 module Admin
   class ServiceBookingsController < BaseController
-    before_action :set_service_booking, only: %i[show edit update assign transition]
+    before_action :set_service_booking, only: %i[show edit update destroy assign transition]
 
     def index
       authorize ServiceBooking
 
-      @q = policy_scope(ServiceBooking).ransack(params[:q])
+      @q = policy_scope(ServiceBooking).ransack(ransack_query_for(ServiceBooking))
       @pagy, @service_bookings = pagy(@q.result.includes(:assigned_to).order(created_at: :desc))
     end
 
@@ -61,6 +61,13 @@ module Admin
       else
         redirect_to admin_service_booking_path(@service_booking), alert: result[:error]
       end
+    end
+
+    def destroy
+      authorize @service_booking
+
+      @service_booking.destroy!
+      redirect_to admin_service_bookings_path, notice: "Service booking was successfully deleted."
     end
 
     private

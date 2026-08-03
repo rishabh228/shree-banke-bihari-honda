@@ -62,6 +62,17 @@ module ApplicationHelper
     Whatsapp::Link.build(phone, message) || "#"
   end
 
+  def export_ransack_params(*keys)
+    query = params[:q]
+    return {} unless query.is_a?(ActionController::Parameters)
+
+    query.permit(*keys).to_h
+  end
+
+  def export_ransack_params_for(model_class)
+    ::SearchQuery::PermittedParams.call(model_class, params[:q]).to_h
+  end
+
   def stock_status_badge(variant)
     label, status_key = if !variant.available? || variant.out_of_stock?
                           [ "Out of Stock", "out_of_stock" ]

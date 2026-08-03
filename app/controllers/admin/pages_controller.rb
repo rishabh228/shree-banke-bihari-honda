@@ -7,7 +7,7 @@ module Admin
     def index
       authorize Page
 
-      @q = policy_scope(Page).ransack(params[:q])
+      @q = policy_scope(Page).ransack(ransack_query_for(Page))
       @pagy, @pages = pagy(@q.result.order(created_at: :desc))
     end
 

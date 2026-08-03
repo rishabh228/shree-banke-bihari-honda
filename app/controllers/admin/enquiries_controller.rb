@@ -2,12 +2,12 @@
 
 module Admin
   class EnquiriesController < BaseController
-    before_action :set_enquiry, only: %i[show edit update destroy]
+    before_action :set_enquiry, only: %i[show edit update destroy convert_to_sale]
 
     def index
       authorize Enquiry
 
-      @q = policy_scope(Enquiry).ransack(params[:q])
+      @q = policy_scope(Enquiry).ransack(ransack_query_for(Enquiry))
       @pagy, @enquiries = pagy(@q.result.includes(:bike).order(created_at: :desc))
     end
 

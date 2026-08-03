@@ -24,7 +24,7 @@
     <div class="flex gap-2">
       <%= f.submit "Search", class: "btn-primary" %>
       <%= link_to "Reset", admin_sales_path, class: "btn-secondary" %>
-      <%= render "shared/pdf_download_button", path: export_pdf_admin_sales_path(q: params[:q]) %>
+      <%= render "shared/pdf_download_button", path: export_pdf_admin_sales_path(q: export_ransack_params_for(Sale)) %>
     </div>
   <% end %>
   <%= link_to "New Sale / Quotation", new_admin_sale_path, class: "btn-primary shrink-0" %>

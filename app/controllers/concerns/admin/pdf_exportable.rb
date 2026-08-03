@@ -7,7 +7,7 @@ module Admin
     private
 
     def export_pdf_scope(model_class, includes: [])
-      scope = policy_scope(model_class).ransack(params[:q]).result.order(created_at: :desc)
+      scope = policy_scope(model_class).ransack(ransack_query_for(model_class)).result.order(created_at: :desc)
       includes.any? ? scope.includes(*includes) : scope
     end
 

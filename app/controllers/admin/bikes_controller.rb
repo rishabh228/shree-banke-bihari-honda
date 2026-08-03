@@ -7,7 +7,7 @@ module Admin
     def index
       authorize Bike
 
-      @q = policy_scope(Bike).ransack(params[:q])
+      @q = policy_scope(Bike).ransack(ransack_query_for(Bike))
       @pagy, @bikes = pagy(@q.result.includes(:bike_variants).order(created_at: :desc))
     end
 

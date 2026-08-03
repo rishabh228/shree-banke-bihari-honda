@@ -7,7 +7,7 @@ module Admin
     def index
       authorize Banner
 
-      @q = policy_scope(Banner).ransack(params[:q])
+      @q = policy_scope(Banner).ransack(ransack_query_for(Banner))
       @pagy, @banners = pagy(@q.result.order(:position, :id))
     end
 

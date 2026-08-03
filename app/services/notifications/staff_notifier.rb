@@ -26,7 +26,7 @@ module Notifications
     def call
       return nil unless enabled?
 
-      message = WhatsappMessageBuilder.staff_message(@event_type, @record)
+      message = Notifications::WhatsappMessageBuilder.staff_message(@event_type, @record)
       whatsapp_url = Whatsapp::Link.build(Setting.instance.whatsapp, message)
 
       users_for_event.find_each do |user|
@@ -45,7 +45,7 @@ module Notifications
     def self.customer_whatsapp_url(event_type, record)
       return nil if Setting.instance.whatsapp.blank?
 
-      message = WhatsappMessageBuilder.customer_message(event_type, record)
+      message = Notifications::WhatsappMessageBuilder.customer_message(event_type, record)
       Whatsapp::Link.build(Setting.instance.whatsapp, message)
     end
 

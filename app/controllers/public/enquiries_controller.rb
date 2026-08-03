@@ -52,14 +52,14 @@ module Public
     end
 
     def contact_submission?
-      request.path == public_contact_path || request.referer&.include?("/contact")
+      request.path == contact_path || request.referer&.include?("/contact")
     end
 
     def enquiry_success_path(enquiry)
       case enquiry.source
-      when "finance" then public_finance_path
-      when "insurance" then public_insurance_path
-      when "contact_form" then public_contact_path
+      when "finance" then finance_path
+      when "insurance" then insurance_path
+      when "contact_form" then contact_path
       else root_path
       end
     end

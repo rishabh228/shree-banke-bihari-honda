@@ -7,7 +7,7 @@ module Admin
     def index
       authorize MediaAsset
 
-      @q = policy_scope(MediaAsset).ransack(params[:q])
+      @q = policy_scope(MediaAsset).ransack(ransack_query_for(MediaAsset))
       @pagy, @media_assets = pagy(@q.result.order(created_at: :desc))
     end
 

@@ -3,6 +3,7 @@
 module Admin
   class BaseController < ApplicationController
     include Admin::PdfExportable
+    include Admin::Ransackable
 
     layout "admin"
 
