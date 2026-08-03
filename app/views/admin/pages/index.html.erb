@@ -1,0 +1,61 @@
+<% content_for :page_title, "Pages" %>
+<% content_for :page_subtitle, "Manage CMS pages" %>
+
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <%= search_form_for @q, url: admin_pages_path, class: "flex flex-wrap items-end gap-3" do |f| %>
+    <div>
+      <%= f.label :title_cont, "Title", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.search_field :title_cont, class: "input-field w-48", placeholder: "Search..." %>
+    </div>
+    <div>
+      <%= f.label :published_eq, "Published", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.select :published_eq, [["Yes", true], ["No", false]], { include_blank: "All" }, class: "input-field w-32" %>
+    </div>
+    <div class="flex gap-2">
+      <%= f.submit "Search", class: "btn-primary" %>
+      <%= link_to "Reset", admin_pages_path, class: "btn-secondary" %>
+    </div>
+  <% end %>
+  <%= link_to "Add Page", new_admin_page_path, class: "btn-primary shrink-0" %>
+</div>
+
+<% if @pages.any? %>
+  <div class="card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Title</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Slug</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Published</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Updated</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <% @pages.each do |page| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 text-sm font-semibold text-honda-dark"><%= page.title %></td>
+              <td class="px-6 py-4 font-mono text-sm text-gray-500"><%= page.slug %></td>
+              <td class="px-6 py-4">
+                <% if page.published? %>
+                  <%= render "shared/status_badge", status: "published", label: "Published" %>
+                <% else %>
+                  <%= render "shared/status_badge", status: "draft", label: "Draft" %>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500"><%= page.updated_at.strftime("%d %b %Y") %></td>
+              <td class="px-6 py-4 text-right text-sm">
+                <%= link_to "View", admin_page_path(page), class: "font-semibold text-honda-red hover:text-red-700" %>
+                <%= link_to "Edit", edit_admin_page_path(page), class: "ml-3 font-semibold text-gray-600 hover:text-honda-dark" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% if @pagy.pages > 1 %><div class="mt-6 flex justify-center"><%== pagy_nav(@pagy) %></div><% end %>
+<% else %>
+  <%= render "shared/empty_state", title: "No pages found", message: "Create CMS pages for your website.", cta_text: "Add Page", cta_path: new_admin_page_path %>
+<% end %>

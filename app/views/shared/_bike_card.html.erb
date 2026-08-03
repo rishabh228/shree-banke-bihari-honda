@@ -1,0 +1,69 @@
+<%# locals: (bike:, featured: false) %>
+<article class="card group flex h-full flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-lg">
+  <%# Image %>
+  <%= link_to bike_path(bike), class: "relative block aspect-[4/3] overflow-hidden bg-gray-100" do %>
+    <% if bike.thumbnail.attached? %>
+      <%= image_tag bike.thumbnail, alt: bike.name, class: "h-full w-full object-cover transition duration-500 group-hover:scale-105" %>
+    <% elsif bike.images.attached? %>
+      <%= image_tag bike.images.first, alt: bike.name, class: "h-full w-full object-cover transition duration-500 group-hover:scale-105" %>
+    <% else %>
+      <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+        <svg class="h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/>
+        </svg>
+      </div>
+    <% end %>
+
+    <% if local_assigns[:featured] %>
+      <span class="absolute left-3 top-3 rounded-full bg-honda-gold px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-honda-dark shadow-sm">
+        Featured
+      </span>
+    <% end %>
+
+    <% if bike.category.present? %>
+      <span class="absolute bottom-3 left-3 rounded-full bg-honda-dark/80 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+        <%= bike.category %>
+      </span>
+    <% end %>
+  <% end %>
+
+  <%# Content %>
+  <div class="flex flex-1 flex-col p-5">
+    <%= link_to bike_path(bike), class: "group/title" do %>
+      <h3 class="font-display text-lg font-semibold text-honda-dark transition group-hover/title:text-honda-red">
+        <%= bike.name %>
+      </h3>
+    <% end %>
+
+    <div class="mt-2 flex flex-wrap gap-3 text-xs text-gray-500">
+      <% if bike.engine.present? %>
+        <span class="inline-flex items-center gap-1">
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>
+          <%= bike.engine %>
+        </span>
+      <% end %>
+      <% if bike.mileage.present? %>
+        <span class="inline-flex items-center gap-1">
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75z"/></svg>
+          <%= bike.mileage %>
+        </span>
+      <% end %>
+    </div>
+
+    <div class="mt-auto pt-4">
+      <p class="text-xs font-medium uppercase tracking-wide text-gray-400">Starting at</p>
+      <p class="font-display text-xl font-bold text-honda-red">
+        <%= format_price(bike.starting_price) %>
+      </p>
+    </div>
+
+    <div class="mt-4 flex gap-2">
+      <%= link_to bike_path(bike), class: "btn-secondary flex-1 py-2 text-center text-sm" do %>
+        View Details
+      <% end %>
+      <%= link_to new_test_ride_path(bike_id: bike.id), class: "btn-primary flex-1 py-2 text-center text-sm" do %>
+        Test Ride
+      <% end %>
+    </div>
+  </div>
+</article>

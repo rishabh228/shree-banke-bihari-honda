@@ -1,0 +1,297 @@
+<%= form_with model: [:admin, bike], class: "space-y-8" do |f| %>
+  <% if bike.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-4">
+      <h3 class="text-sm font-semibold text-red-800"><%= pluralize(bike.errors.count, "error") %> prohibited this bike from being saved:</h3>
+      <ul class="mt-2 list-inside list-disc text-sm text-red-700">
+        <% bike.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%# Basic details %>
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Basic Details</h2>
+    <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div>
+        <%= f.label :name, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :name, class: "input-field", required: true %>
+      </div>
+      <div>
+        <%= f.label :slug, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :slug, class: "input-field", placeholder: "Auto-generated from name if blank" %>
+      </div>
+      <div>
+        <%= f.label :category, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :category, class: "input-field", placeholder: "e.g. Scooter, Motorcycle" %>
+      </div>
+      <div>
+        <%= f.label :status, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.select :status, Bike.statuses.keys.map { |s| [s.humanize.titleize, s] }, {}, class: "input-field" %>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :description, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :description, rows: 4, class: "input-field" %>
+      </div>
+    </div>
+  </div>
+
+  <%# Specifications %>
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Key Specifications</h2>
+    <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div>
+        <%= f.label :engine, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :engine, class: "input-field", placeholder: "e.g. 110cc" %>
+      </div>
+      <div>
+        <%= f.label :mileage, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :mileage, class: "input-field", placeholder: "e.g. 60 km/l" %>
+      </div>
+      <div>
+        <%= f.label :power, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :power, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :torque, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :torque, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :fuel_tank, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :fuel_tank, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :weight, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :weight, class: "input-field" %>
+      </div>
+    </div>
+  </div>
+
+  <%# Media %>
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Media & Documents</h2>
+    <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div>
+        <%= f.label :thumbnail, "Thumbnail", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <% if bike.thumbnail.attached? %>
+          <div class="mb-3"><%= image_tag bike.thumbnail, class: "h-24 w-32 rounded-lg object-cover" %></div>
+        <% end %>
+        <%= f.file_field :thumbnail, class: "block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-honda-red file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-red-700" %>
+      </div>
+      <div>
+        <%= f.label :brochure, "Brochure (PDF)", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <% if bike.brochure.attached? %>
+          <p class="mb-2 text-sm text-gray-600">Current: <%= bike.brochure.filename %></p>
+        <% end %>
+        <%= f.file_field :brochure, accept: "application/pdf", class: "block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-gray-700 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-gray-800" %>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :images, "Gallery Images", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <% if bike.images.attached? %>
+          <div class="mb-3 flex flex-wrap gap-2">
+            <% bike.images.each do |image| %>
+              <%= image_tag image, class: "h-20 w-28 rounded-lg object-cover" %>
+            <% end %>
+          </div>
+        <% end %>
+        <%= f.file_field :images, multiple: true, accept: "image/*", class: "block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-honda-red file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-red-700" %>
+      </div>
+    </div>
+  </div>
+
+  <%# SEO %>
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">SEO</h2>
+    <div class="mt-6 grid grid-cols-1 gap-6">
+      <div>
+        <%= f.label :seo_title, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :seo_title, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :seo_description, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :seo_description, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :meta_keywords, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :meta_keywords, rows: 2, class: "input-field" %>
+      </div>
+    </div>
+  </div>
+
+  <%# Variants %>
+  <div class="card p-6">
+    <div class="flex items-center justify-between">
+      <h2 class="font-display text-lg font-semibold text-honda-dark">Variants & Pricing</h2>
+      <button type="button" data-nested-add="bike_variants" class="btn-secondary text-xs">Add Variant</button>
+    </div>
+    <div id="bike_variants" class="mt-6 space-y-4" data-nested-container="bike_variants">
+      <%= f.fields_for :bike_variants do |variant_form| %>
+        <div class="rounded-lg border border-gray-200 bg-gray-50 p-4" data-nested-item>
+          <%= variant_form.hidden_field :id %>
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+            <div>
+              <%= variant_form.label :name, class: "mb-1 block text-xs font-medium text-gray-600" %>
+              <%= variant_form.text_field :name, class: "input-field", placeholder: "Variant name" %>
+            </div>
+            <div>
+              <%= variant_form.label :color, class: "mb-1 block text-xs font-medium text-gray-600" %>
+              <%= variant_form.text_field :color, class: "input-field" %>
+            </div>
+            <div>
+              <%= variant_form.label :ex_showroom_price, "Ex-Showroom", class: "mb-1 block text-xs font-medium text-gray-600" %>
+              <%= variant_form.number_field :ex_showroom_price, step: 0.01, min: 0, class: "input-field" %>
+            </div>
+            <div>
+              <%= variant_form.label :insurance, class: "mb-1 block text-xs font-medium text-gray-600" %>
+              <%= variant_form.number_field :insurance, step: 0.01, min: 0, class: "input-field" %>
+            </div>
+            <div>
+              <%= variant_form.label :rto, class: "mb-1 block text-xs font-medium text-gray-600" %>
+              <%= variant_form.number_field :rto, step: 0.01, min: 0, class: "input-field" %>
+            </div>
+            <div>
+              <%= variant_form.label :handling_charge, class: "mb-1 block text-xs font-medium text-gray-600" %>
+              <%= variant_form.number_field :handling_charge, step: 0.01, min: 0, class: "input-field" %>
+            </div>
+            <div>
+              <%= variant_form.label :accessories_charge, class: "mb-1 block text-xs font-medium text-gray-600" %>
+              <%= variant_form.number_field :accessories_charge, step: 0.01, min: 0, class: "input-field" %>
+            </div>
+            <div>
+              <%= variant_form.label :total_price, class: "mb-1 block text-xs font-medium text-gray-600" %>
+              <%= variant_form.number_field :total_price, step: 0.01, min: 0, class: "input-field", placeholder: "Auto-calculated on save" %>
+            </div>
+            <div class="flex items-end gap-4">
+              <label class="flex items-center gap-2 text-sm text-gray-700">
+                <%= variant_form.check_box :available, class: "rounded border-gray-300 text-honda-red focus:ring-honda-red" %>
+                Available
+              </label>
+              <% if variant_form.object.persisted? %>
+                <label class="flex items-center gap-2 text-sm text-red-600">
+                  <%= variant_form.check_box :_destroy, class: "rounded border-gray-300 text-red-600 focus:ring-red-500" %>
+                  Remove
+                </label>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Features %>
+  <div class="card p-6">
+    <div class="flex items-center justify-between">
+      <h2 class="font-display text-lg font-semibold text-honda-dark">Features</h2>
+      <button type="button" data-nested-add="bike_features" class="btn-secondary text-xs">Add Feature</button>
+    </div>
+    <div id="bike_features" class="mt-6 space-y-3" data-nested-container="bike_features">
+      <%= f.fields_for :bike_features do |feature_form| %>
+        <div class="flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3" data-nested-item>
+          <%= feature_form.hidden_field :id %>
+          <div class="min-w-[200px] flex-1">
+            <%= feature_form.label :title, class: "mb-1 block text-xs font-medium text-gray-600" %>
+            <%= feature_form.text_field :title, class: "input-field" %>
+          </div>
+          <div class="w-24">
+            <%= feature_form.label :position, class: "mb-1 block text-xs font-medium text-gray-600" %>
+            <%= feature_form.number_field :position, class: "input-field" %>
+          </div>
+          <% if feature_form.object.persisted? %>
+            <label class="flex items-center gap-2 pb-2 text-sm text-red-600">
+              <%= feature_form.check_box :_destroy, class: "rounded border-gray-300 text-red-600 focus:ring-red-500" %>
+              Remove
+            </label>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Detailed specifications %>
+  <div class="card p-6">
+    <div class="flex items-center justify-between">
+      <h2 class="font-display text-lg font-semibold text-honda-dark">Detailed Specifications</h2>
+      <button type="button" data-nested-add="bike_specifications" class="btn-secondary text-xs">Add Specification</button>
+    </div>
+    <div id="bike_specifications" class="mt-6 space-y-3" data-nested-container="bike_specifications">
+      <%= f.fields_for :bike_specifications do |spec_form| %>
+        <div class="flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3" data-nested-item>
+          <%= spec_form.hidden_field :id %>
+          <div class="min-w-[160px] flex-1">
+            <%= spec_form.label :label, class: "mb-1 block text-xs font-medium text-gray-600" %>
+            <%= spec_form.text_field :label, class: "input-field", placeholder: "e.g. Brakes" %>
+          </div>
+          <div class="min-w-[160px] flex-1">
+            <%= spec_form.label :value, class: "mb-1 block text-xs font-medium text-gray-600" %>
+            <%= spec_form.text_field :value, class: "input-field" %>
+          </div>
+          <div class="w-24">
+            <%= spec_form.label :position, class: "mb-1 block text-xs font-medium text-gray-600" %>
+            <%= spec_form.number_field :position, class: "input-field" %>
+          </div>
+          <% if spec_form.object.persisted? %>
+            <label class="flex items-center gap-2 pb-2 text-sm text-red-600">
+              <%= spec_form.check_box :_destroy, class: "rounded border-gray-300 text-red-600 focus:ring-red-500" %>
+              Remove
+            </label>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= f.submit class: "btn-primary cursor-pointer" %>
+    <%= link_to "Cancel", bike.persisted? ? admin_bike_path(bike) : admin_bikes_path, class: "btn-secondary" %>
+  </div>
+<% end %>
+
+<template id="template_bike_variants">
+  <div class="rounded-lg border border-gray-200 bg-gray-50 p-4" data-nested-item>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+      <div><label class="mb-1 block text-xs font-medium text-gray-600">Name</label><input type="text" name="bike[bike_variants_attributes][NEW_RECORD][name]" class="input-field"></div>
+      <div><label class="mb-1 block text-xs font-medium text-gray-600">Color</label><input type="text" name="bike[bike_variants_attributes][NEW_RECORD][color]" class="input-field"></div>
+      <div><label class="mb-1 block text-xs font-medium text-gray-600">Ex-Showroom</label><input type="number" step="0.01" min="0" name="bike[bike_variants_attributes][NEW_RECORD][ex_showroom_price]" class="input-field"></div>
+      <div><label class="mb-1 block text-xs font-medium text-gray-600">Insurance</label><input type="number" step="0.01" min="0" name="bike[bike_variants_attributes][NEW_RECORD][insurance]" class="input-field"></div>
+      <div><label class="mb-1 block text-xs font-medium text-gray-600">RTO</label><input type="number" step="0.01" min="0" name="bike[bike_variants_attributes][NEW_RECORD][rto]" class="input-field"></div>
+      <div><label class="mb-1 block text-xs font-medium text-gray-600">Handling Charge</label><input type="number" step="0.01" min="0" name="bike[bike_variants_attributes][NEW_RECORD][handling_charge]" class="input-field"></div>
+      <div><label class="mb-1 block text-xs font-medium text-gray-600">Accessories Charge</label><input type="number" step="0.01" min="0" name="bike[bike_variants_attributes][NEW_RECORD][accessories_charge]" class="input-field"></div>
+      <div><label class="mb-1 block text-xs font-medium text-gray-600">Total Price</label><input type="number" step="0.01" min="0" name="bike[bike_variants_attributes][NEW_RECORD][total_price]" class="input-field"></div>
+      <div class="flex items-end"><label class="flex items-center gap-2 text-sm text-gray-700"><input type="hidden" name="bike[bike_variants_attributes][NEW_RECORD][available]" value="0"><input type="checkbox" name="bike[bike_variants_attributes][NEW_RECORD][available]" value="1" checked class="rounded border-gray-300 text-honda-red focus:ring-honda-red"> Available</label></div>
+    </div>
+  </div>
+</template>
+
+<template id="template_bike_features">
+  <div class="flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3" data-nested-item>
+    <div class="min-w-[200px] flex-1"><label class="mb-1 block text-xs font-medium text-gray-600">Title</label><input type="text" name="bike[bike_features_attributes][NEW_RECORD][title]" class="input-field"></div>
+    <div class="w-24"><label class="mb-1 block text-xs font-medium text-gray-600">Position</label><input type="number" name="bike[bike_features_attributes][NEW_RECORD][position]" class="input-field" value="0"></div>
+  </div>
+</template>
+
+<template id="template_bike_specifications">
+  <div class="flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3" data-nested-item>
+    <div class="min-w-[160px] flex-1"><label class="mb-1 block text-xs font-medium text-gray-600">Label</label><input type="text" name="bike[bike_specifications_attributes][NEW_RECORD][label]" class="input-field"></div>
+    <div class="min-w-[160px] flex-1"><label class="mb-1 block text-xs font-medium text-gray-600">Value</label><input type="text" name="bike[bike_specifications_attributes][NEW_RECORD][value]" class="input-field"></div>
+    <div class="w-24"><label class="mb-1 block text-xs font-medium text-gray-600">Position</label><input type="number" name="bike[bike_specifications_attributes][NEW_RECORD][position]" class="input-field" value="0"></div>
+  </div>
+</template>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    let nestedIndex = <%= Time.current.to_i %>;
+    document.querySelectorAll("[data-nested-add]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        const key = button.getAttribute("data-nested-add");
+        const template = document.getElementById("template_" + key);
+        const container = document.querySelector('[data-nested-container="' + key + '"]');
+        if (!template || !container) return;
+        nestedIndex += 1;
+        const html = template.innerHTML.replace(/NEW_RECORD/g, nestedIndex);
+        container.insertAdjacentHTML("beforeend", html);
+      });
+    });
+  });
+</script>

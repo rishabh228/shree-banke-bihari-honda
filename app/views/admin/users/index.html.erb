@@ -1,0 +1,63 @@
+<% content_for :page_title, "Users" %>
+<% content_for :page_subtitle, "Manage staff accounts" %>
+
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <%= search_form_for @q, url: admin_users_path, class: "flex flex-wrap items-end gap-3" do |f| %>
+    <div>
+      <%= f.label :name_cont, "Name", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.search_field :name_cont, class: "input-field w-44", placeholder: "Search..." %>
+    </div>
+    <div>
+      <%= f.label :email_cont, "Email", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.search_field :email_cont, class: "input-field w-48", placeholder: "Email..." %>
+    </div>
+    <div>
+      <%= f.label :role_eq, "Role", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.select :role_eq, User.roles.map { |k, v| [k.humanize.titleize, v] }, { include_blank: "All" }, class: "input-field w-44" %>
+    </div>
+    <div class="flex gap-2">
+      <%= f.submit "Search", class: "btn-primary" %>
+      <%= link_to "Reset", admin_users_path, class: "btn-secondary" %>
+    </div>
+  <% end %>
+  <%= link_to "Add User", new_admin_user_path, class: "btn-primary shrink-0" %>
+</div>
+
+<% if @users.any? %>
+  <div class="card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">User</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Email</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Role</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <% @users.each do |user| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="flex h-9 w-9 items-center justify-center rounded-full bg-honda-red text-sm font-bold text-white">
+                    <%= user.name.to_s.first.upcase %>
+                  </div>
+                  <span class="text-sm font-semibold text-honda-dark"><%= user.name %></span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-700"><%= user.email %></td>
+              <td class="px-6 py-4 text-sm text-gray-700"><%= user.display_role %></td>
+              <td class="px-6 py-4 text-right text-sm">
+                <%= link_to "Edit", edit_admin_user_path(user), class: "font-semibold text-honda-red hover:text-red-700" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% if @pagy.pages > 1 %><div class="mt-6 flex justify-center"><%== pagy_nav(@pagy) %></div><% end %>
+<% else %>
+  <%= render "shared/empty_state", title: "No users found", message: "Add staff members to manage the showroom.", cta_text: "Add User", cta_path: new_admin_user_path %>
+<% end %>

@@ -1,0 +1,93 @@
+<% content_for :title, "Honda Bikes" %>
+<% content_for :meta_description, "Browse the complete range of Honda motorcycles and scooters at #{current_settings.showroom_name}. Compare models, prices, and book a test ride." %>
+
+<%# Page Header %>
+<section class="border-b border-gray-200 bg-white">
+  <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+    <p class="text-sm font-semibold uppercase tracking-widest text-honda-red">Our Range</p>
+    <h1 class="mt-2 font-display text-3xl font-bold text-honda-dark sm:text-4xl">Honda Bikes &amp; Scooters</h1>
+    <p class="mt-3 max-w-2xl text-gray-600">Explore every model available at our showroom. Filter by category or search by name to find your perfect ride.</p>
+  </div>
+</section>
+
+<div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+  <div class="grid gap-8 lg:grid-cols-[280px_1fr] lg:gap-12">
+    <%# Filters Sidebar %>
+    <aside class="lg:sticky lg:top-24 lg:self-start">
+      <div class="card p-6">
+        <h2 class="font-display text-lg font-semibold text-honda-dark">Filter Bikes</h2>
+        <%= search_form_for @q, url: bikes_path, method: :get, html: { class: "mt-5 space-y-5" } do |f| %>
+          <div>
+            <%= f.label :name_cont, "Search by Name", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+            <%= f.search_field :name_cont, class: "input-field", placeholder: "e.g. Activa, Hornet..." %>
+          </div>
+
+          <div>
+            <%= f.label :category_eq, "Category", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+            <%= f.select :category_eq,
+                  options_for_select([ [ "All Categories", "" ] ] + @categories.map { |c| [ c, c ] }, @q.category_eq),
+                  {},
+                  class: "input-field" %>
+          </div>
+
+          <div>
+            <%= f.label :engine_cont, "Engine", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+            <%= f.search_field :engine_cont, class: "input-field", placeholder: "e.g. 110cc, 160cc" %>
+          </div>
+
+          <div class="flex flex-col gap-2 pt-2">
+            <%= f.submit "Apply Filters", class: "btn-primary w-full" %>
+            <%= link_to "Clear Filters", bikes_path, class: "btn-secondary w-full text-center" %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="mt-6 hidden rounded-xl bg-honda-dark p-6 text-white lg:block">
+        <h3 class="font-display font-semibold">Need Help Choosing?</h3>
+        <p class="mt-2 text-sm text-gray-300">Our sales team can recommend the best Honda for your needs and budget.</p>
+        <%= link_to "Talk to Us", contact_path, class: "btn-primary mt-4 w-full justify-center text-sm" %>
+      </div>
+    </aside>
+
+    <%# Results Grid %>
+    <div>
+      <div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-sm text-gray-500">
+          <% if @bikes.any? %>
+            Showing <span class="font-semibold text-honda-dark"><%= @pagy.from %>–<%= @pagy.to %></span> of
+            <span class="font-semibold text-honda-dark"><%= @pagy.count %></span> bikes
+          <% else %>
+            No bikes match your filters
+          <% end %>
+        </p>
+        <%= link_to new_test_ride_path, class: "btn-primary inline-flex text-sm" do %>
+          Book Test Ride
+        <% end %>
+      </div>
+
+      <% if @bikes.any? %>
+        <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          <% @bikes.each do |bike| %>
+            <%= render "shared/bike_card", bike: bike %>
+          <% end %>
+        </div>
+
+        <% if @pagy.pages > 1 %>
+          <nav class="mt-10 flex justify-center" aria-label="Pagination">
+            <div class="pagy-nav flex flex-wrap items-center gap-1">
+              <%== pagy_nav(@pagy) %>
+            </div>
+          </nav>
+        <% end %>
+      <% else %>
+        <%= render "shared/empty_state",
+              title: "No Bikes Found",
+              message: "Try adjusting your filters or browse our full collection.",
+              icon: "search",
+              cta_text: "Clear Filters",
+              cta_path: bikes_path %>
+      <% end %>
+    </div>
+  </div>
+</div>
+

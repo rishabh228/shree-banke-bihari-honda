@@ -1,0 +1,262 @@
+<% content_for :title, @bike.seo_title.presence || @bike.name %>
+<% content_for :meta_description, @bike.seo_description.presence || truncate(@bike.description.to_s, length: 160) %>
+
+<%# Breadcrumb %>
+<div class="border-b border-gray-200 bg-white">
+  <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+    <nav class="flex flex-wrap items-center gap-2 text-sm text-gray-500" aria-label="Breadcrumb">
+      <%= link_to "Home", root_path, class: "transition hover:text-honda-red" %>
+      <span aria-hidden="true">/</span>
+      <%= link_to "Bikes", bikes_path, class: "transition hover:text-honda-red" %>
+      <span aria-hidden="true">/</span>
+      <span class="font-medium text-honda-dark"><%= @bike.name %></span>
+    </nav>
+  </div>
+</div>
+
+<div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+  <div class="grid gap-10 lg:grid-cols-2 lg:gap-14">
+    <%# Gallery %>
+    <div>
+      <div class="card overflow-hidden">
+        <% primary_image = @bike.thumbnail if @bike.thumbnail.attached? %>
+        <% primary_image ||= @bike.images.first if @bike.images.attached? %>
+        <div class="aspect-[4/3] bg-gray-100">
+          <% if primary_image %>
+            <%= image_tag primary_image, alt: @bike.name, class: "h-full w-full object-cover", id: "bike-main-image" %>
+          <% else %>
+            <div class="flex h-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+              <svg class="h-24 w-24 text-gray-300" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/>
+              </svg>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <% if @bike.images.attached? && @bike.images.size > 1 %>
+        <div class="mt-4 grid grid-cols-4 gap-3 sm:grid-cols-5">
+          <% @bike.images.each do |image| %>
+            <button type="button"
+                    onclick="document.getElementById('bike-main-image').src = '<%= url_for(image) %>'"
+                    class="aspect-square overflow-hidden rounded-lg border-2 border-transparent bg-gray-100 transition hover:border-honda-red focus:border-honda-red focus:outline-none">
+              <%= image_tag image, alt: "#{@bike.name} thumbnail", class: "h-full w-full object-cover" %>
+            </button>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Summary & CTAs %>
+    <div>
+      <% if @bike.category.present? %>
+        <span class="inline-flex rounded-full bg-red-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-honda-red"><%= @bike.category %></span>
+      <% end %>
+      <h1 class="mt-3 font-display text-3xl font-bold text-honda-dark sm:text-4xl"><%= @bike.name %></h1>
+
+      <div class="mt-4 flex flex-wrap gap-4 text-sm text-gray-600">
+        <% if @bike.engine.present? %>
+          <span class="inline-flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-1.5">
+            <svg class="h-4 w-4 text-honda-red" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>
+            <%= @bike.engine %>
+          </span>
+        <% end %>
+        <% if @bike.mileage.present? %>
+          <span class="inline-flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-1.5">
+            <svg class="h-4 w-4 text-honda-red" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75z"/></svg>
+            <%= @bike.mileage %>
+          </span>
+        <% end %>
+        <% if @bike.power.present? %>
+          <span class="inline-flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-1.5"><%= @bike.power %></span>
+        <% end %>
+      </div>
+
+      <div class="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-5">
+        <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Starting On-Road Price</p>
+        <p class="mt-1 font-display text-3xl font-bold text-honda-red"><%= format_price(@bike.starting_price) %></p>
+        <p class="mt-1 text-xs text-gray-500">*Price varies by variant and location. Contact us for exact quote.</p>
+      </div>
+
+      <% if @bike.description.present? %>
+        <div class="mt-6 text-sm leading-relaxed text-gray-600">
+          <p><%= @bike.description %></p>
+        </div>
+      <% end %>
+
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+        <%= link_to new_test_ride_path(bike_id: @bike.id), class: "btn-primary flex-1 justify-center py-3" do %>
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/></svg>
+          Book Test Ride
+        <% end %>
+        <%= link_to new_enquiry_path(bike_id: @bike.id, source: "bike_enquiry"), class: "btn-secondary flex-1 justify-center py-3" do %>
+          Enquire Now
+        <% end %>
+      </div>
+
+      <% if @bike.brochure.attached? %>
+        <div class="mt-4">
+          <%= link_to rails_blob_path(@bike.brochure, disposition: "attachment"), class: "inline-flex items-center gap-2 text-sm font-medium text-honda-red hover:underline" do %>
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            Download Brochure
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Variant Price Table %>
+  <% if @variants.any? %>
+    <section class="mt-14" aria-labelledby="variants-heading">
+      <h2 id="variants-heading" class="font-display text-2xl font-bold text-honda-dark">Variants &amp; On-Road Price</h2>
+      <p class="mt-2 text-sm text-gray-500">Transparent pricing breakdown for each available variant.</p>
+
+      <div class="mt-6 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-4 py-3 text-left font-semibold text-honda-dark sm:px-6">Variant</th>
+              <th scope="col" class="px-4 py-3 text-left font-semibold text-honda-dark sm:px-6">Color</th>
+              <th scope="col" class="hidden px-4 py-3 text-right font-semibold text-honda-dark md:table-cell sm:px-6">Ex-Showroom</th>
+              <th scope="col" class="hidden px-4 py-3 text-right font-semibold text-honda-dark lg:table-cell sm:px-6">Insurance</th>
+              <th scope="col" class="hidden px-4 py-3 text-right font-semibold text-honda-dark lg:table-cell sm:px-6">RTO</th>
+              <th scope="col" class="px-4 py-3 text-right font-semibold text-honda-dark sm:px-6">On-Road Total</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <% @variants.each do |variant| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-4 font-medium text-honda-dark sm:px-6"><%= variant.name %></td>
+                <td class="px-4 py-4 text-gray-600 sm:px-6"><%= variant.color.presence || "—" %></td>
+                <td class="hidden px-4 py-4 text-right text-gray-600 md:table-cell sm:px-6"><%= format_price(variant.ex_showroom_price) %></td>
+                <td class="hidden px-4 py-4 text-right text-gray-600 lg:table-cell sm:px-6"><%= format_price(variant.insurance) %></td>
+                <td class="hidden px-4 py-4 text-right text-gray-600 lg:table-cell sm:px-6"><%= format_price(variant.rto) %></td>
+                <td class="px-4 py-4 text-right font-display font-bold text-honda-red sm:px-6"><%= format_price(variant.total_price) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% end %>
+
+  <%# Features & Specs Tabs %>
+  <% if @features.any? || @specifications.any? %>
+    <section class="mt-14" aria-labelledby="details-heading">
+      <h2 id="details-heading" class="font-display text-2xl font-bold text-honda-dark">Features &amp; Specifications</h2>
+
+      <div class="mt-6">
+        <div class="flex border-b border-gray-200" role="tablist">
+          <% if @features.any? %>
+            <button type="button" role="tab" aria-selected="true" aria-controls="tab-features" id="tab-btn-features"
+                    onclick="switchBikeTab('features')"
+                    class="bike-tab-btn border-b-2 border-honda-red px-6 py-3 text-sm font-semibold text-honda-red">
+              Key Features
+            </button>
+          <% end %>
+          <% if @specifications.any? %>
+            <button type="button" role="tab" aria-selected="<%= @features.empty? %>" aria-controls="tab-specs" id="tab-btn-specs"
+                    onclick="switchBikeTab('specs')"
+                    class="bike-tab-btn border-b-2 <%= @features.any? ? 'border-transparent text-gray-500' : 'border-honda-red text-honda-red' %> px-6 py-3 text-sm font-semibold transition hover:text-honda-red">
+              Specifications
+            </button>
+          <% end %>
+        </div>
+
+        <% if @features.any? %>
+          <div id="tab-features" role="tabpanel" class="bike-tab-panel card mt-0 rounded-t-none border-t-0 p-6 sm:p-8">
+            <ul class="grid gap-3 sm:grid-cols-2">
+              <% @features.each do |feature| %>
+                <li class="flex items-start gap-3 text-sm text-gray-700">
+                  <svg class="mt-0.5 h-5 w-5 shrink-0 text-honda-red" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                  </svg>
+                  <%= feature.title %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <% if @specifications.any? %>
+          <div id="tab-specs" role="tabpanel" class="bike-tab-panel card mt-0 rounded-t-none border-t-0 p-6 sm:p-8 <%= 'hidden' if @features.any? %>">
+            <dl class="divide-y divide-gray-100">
+              <% @specifications.each do |spec| %>
+                <div class="flex flex-col gap-1 py-3 sm:flex-row sm:justify-between sm:gap-4">
+                  <dt class="text-sm font-medium text-gray-500"><%= spec.label %></dt>
+                  <dd class="text-sm font-semibold text-honda-dark sm:text-right"><%= spec.value %></dd>
+                </div>
+              <% end %>
+            </dl>
+
+            <% if @bike.engine.present? || @bike.mileage.present? || @bike.power.present? || @bike.torque.present? || @bike.fuel_tank.present? || @bike.weight.present? %>
+              <div class="mt-6 border-t border-gray-100 pt-6">
+                <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-400">Quick Specs</h3>
+                <dl class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  <% { "Engine" => @bike.engine, "Mileage" => @bike.mileage, "Power" => @bike.power, "Torque" => @bike.torque, "Fuel Tank" => @bike.fuel_tank, "Weight" => @bike.weight }.each do |label, value| %>
+                    <% next if value.blank? %>
+                    <div class="rounded-lg bg-gray-50 px-4 py-3">
+                      <dt class="text-xs text-gray-500"><%= label %></dt>
+                      <dd class="mt-0.5 font-semibold text-honda-dark"><%= value %></dd>
+                    </div>
+                  <% end %>
+                </dl>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <%# Related Offers %>
+  <% if @related_offers.any? %>
+    <section class="mt-14" aria-labelledby="offers-heading">
+      <h2 id="offers-heading" class="font-display text-2xl font-bold text-honda-dark">Active Offers on <%= @bike.name %></h2>
+      <div class="mt-6 grid gap-4 sm:grid-cols-3">
+        <% @related_offers.each do |offer| %>
+          <div class="card p-5">
+            <h3 class="font-display font-semibold text-honda-dark"><%= offer.title %></h3>
+            <% if offer.description.present? %>
+              <p class="mt-2 text-sm text-gray-600 line-clamp-2"><%= offer.description %></p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <%# Bottom CTA %>
+  <section class="mt-14 rounded-2xl bg-honda-dark px-6 py-10 text-center sm:px-10">
+    <h2 class="font-display text-2xl font-bold text-white">Experience the <%= @bike.name %> in person</h2>
+    <p class="mx-auto mt-3 max-w-lg text-gray-300">Schedule a free test ride at our showroom or speak to our team for the best price.</p>
+    <div class="mt-8 flex flex-wrap justify-center gap-4">
+      <%= link_to "Book Test Ride", new_test_ride_path(bike_id: @bike.id), class: "btn-primary" %>
+      <%= link_to "Get a Quote", new_enquiry_path(bike_id: @bike.id, source: "bike_enquiry"), class: "btn-outline-light" %>
+      <%= link_to "Finance Options", finance_path, class: "btn-outline-light" %>
+    </div>
+  </section>
+</div>
+
+<script>
+  function switchBikeTab(tab) {
+    const featuresPanel = document.getElementById('tab-features');
+    const specsPanel = document.getElementById('tab-specs');
+    const featuresBtn = document.getElementById('tab-btn-features');
+    const specsBtn = document.getElementById('tab-btn-specs');
+    const active = 'border-honda-red text-honda-red';
+    const inactive = 'border-transparent text-gray-500';
+
+    if (tab === 'features') {
+      if (featuresPanel) featuresPanel.classList.remove('hidden');
+      if (specsPanel) specsPanel.classList.add('hidden');
+      if (featuresBtn) { featuresBtn.className = 'bike-tab-btn border-b-2 ' + active + ' px-6 py-3 text-sm font-semibold'; featuresBtn.setAttribute('aria-selected', 'true'); }
+      if (specsBtn) { specsBtn.className = 'bike-tab-btn border-b-2 ' + inactive + ' px-6 py-3 text-sm font-semibold transition hover:text-honda-red'; specsBtn.setAttribute('aria-selected', 'false'); }
+    } else {
+      if (featuresPanel) featuresPanel.classList.add('hidden');
+      if (specsPanel) specsPanel.classList.remove('hidden');
+      if (specsBtn) { specsBtn.className = 'bike-tab-btn border-b-2 ' + active + ' px-6 py-3 text-sm font-semibold'; specsBtn.setAttribute('aria-selected', 'true'); }
+      if (featuresBtn) { featuresBtn.className = 'bike-tab-btn border-b-2 ' + inactive + ' px-6 py-3 text-sm font-semibold transition hover:text-honda-red'; featuresBtn.setAttribute('aria-selected', 'false'); }
+    }
+  }
+</script>

@@ -1,0 +1,38 @@
+<% content_for :page_title, "Settings" %>
+<% content_for :page_subtitle, "Showroom configuration" %>
+
+<div class="mb-6">
+  <%= link_to "Edit Settings", edit_admin_settings_path, class: "btn-primary" %>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Branding</h2>
+    <dl class="mt-4 space-y-3">
+      <div><dt class="text-xs text-gray-500">Showroom Name</dt><dd class="text-sm font-medium"><%= @setting.showroom_name %></dd></div>
+      <% if @setting.logo.attached? %>
+        <div><dt class="text-xs text-gray-500">Logo</dt><dd class="mt-2"><%= image_tag @setting.logo, class: "h-16 w-auto rounded-lg border border-gray-200 bg-white p-2" %></dd></div>
+      <% end %>
+    </dl>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Contact</h2>
+    <dl class="mt-4 space-y-3">
+      <div><dt class="text-xs text-gray-500">Address</dt><dd class="text-sm"><%= simple_format(@setting.address.presence || "—") %></dd></div>
+      <div><dt class="text-xs text-gray-500">Phone</dt><dd class="text-sm font-medium"><%= @setting.phone.presence || "—" %></dd></div>
+      <div><dt class="text-xs text-gray-500">Email</dt><dd class="text-sm font-medium"><%= @setting.email.presence || "—" %></dd></div>
+      <div><dt class="text-xs text-gray-500">WhatsApp</dt><dd class="text-sm font-medium"><%= @setting.whatsapp.presence || "—" %></dd></div>
+      <div><dt class="text-xs text-gray-500">Business Hours</dt><dd class="text-sm"><%= simple_format(@setting.business_hours.presence || "—") %></dd></div>
+    </dl>
+  </div>
+
+  <div class="card p-6 lg:col-span-2">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Social Media</h2>
+    <dl class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div><dt class="text-xs text-gray-500">Facebook</dt><dd class="text-sm break-all"><%= @setting.facebook.presence || "—" %></dd></div>
+      <div><dt class="text-xs text-gray-500">Instagram</dt><dd class="text-sm break-all"><%= @setting.instagram.presence || "—" %></dd></div>
+      <div><dt class="text-xs text-gray-500">YouTube</dt><dd class="text-sm break-all"><%= @setting.youtube.presence || "—" %></dd></div>
+    </dl>
+  </div>
+</div>

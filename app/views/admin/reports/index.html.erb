@@ -1,0 +1,77 @@
+<% content_for :page_title, "Reports" %>
+<% content_for :page_subtitle, "Analytics and business insights" %>
+
+<%# Summary stats %>
+<div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <% [
+    ["Today's Enquiries", @stats[:today_enquiries], "text-rose-600"],
+    ["Today's Test Rides", @stats[:today_test_rides], "text-sky-600"],
+    ["Today's Services", @stats[:today_services], "text-violet-600"],
+    ["Total Customers", @stats[:total_customers], "text-emerald-600"]
+  ].each do |label, value, color| %>
+    <div class="card p-5">
+      <p class="text-sm font-medium text-gray-500"><%= label %></p>
+      <p class="mt-2 font-display text-3xl font-bold <%= color %>"><%= value %></p>
+    </div>
+  <% end %>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Monthly Enquiries</h2>
+    <p class="mt-1 text-sm text-gray-500">Enquiry volume over the last 6 months</p>
+    <div class="mt-4">
+      <%= line_chart @charts[:monthly_enquiries], colors: ["#CC0000"], height: "320px", library: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } } %>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Monthly Test Rides</h2>
+    <p class="mt-1 text-sm text-gray-500">Test ride bookings over the last 6 months</p>
+    <div class="mt-4">
+      <%= line_chart @charts[:monthly_test_rides], colors: ["#1A1A1A"], height: "320px", library: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } } %>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Popular Bikes</h2>
+    <p class="mt-1 text-sm text-gray-500">Most requested bikes for test rides</p>
+    <div class="mt-4">
+      <%= pie_chart @charts[:popular_bikes], colors: ["#CC0000", "#1A1A1A", "#C9A227", "#3B82F6", "#10B981", "#F59E0B", "#8B5CF6"], height: "320px", donut: true %>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Service Booking Status</h2>
+    <p class="mt-1 text-sm text-gray-500">Distribution by workflow status</p>
+    <div class="mt-4">
+      <%= pie_chart @charts[:service_stats], colors: ["#CC0000", "#1A1A1A", "#3B82F6", "#10B981", "#14B8A6", "#EF4444"], height: "320px", donut: true %>
+    </div>
+  </div>
+</div>
+
+<%# Additional KPI row %>
+<div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <% [
+    ["Active Bikes", @stats[:active_bikes]],
+    ["Active Offers", @stats[:active_offers]],
+    ["Pending Test Rides", @stats[:pending_test_rides]],
+    ["Open Enquiries", @stats[:open_enquiries]]
+  ].each do |label, value| %>
+    <div class="card p-5 text-center">
+      <p class="text-sm font-medium text-gray-500"><%= label %></p>
+      <p class="mt-2 font-display text-2xl font-bold text-honda-dark"><%= value %></p>
+    </div>
+  <% end %>
+</div>
+
+<div class="mt-8 card p-6">
+  <h2 class="font-display text-lg font-semibold text-honda-dark">Combined Activity Trend</h2>
+  <p class="mt-1 text-sm text-gray-500">Enquiries vs test rides (6 months)</p>
+  <div class="mt-4">
+    <%= line_chart [
+          { name: "Enquiries", data: @charts[:monthly_enquiries] },
+          { name: "Test Rides", data: @charts[:monthly_test_rides] }
+        ], colors: ["#CC0000", "#1A1A1A"], height: "360px", library: { scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } } %>
+  </div>
+</div>

@@ -1,0 +1,105 @@
+<%# Public navigation — sticky header with mobile drawer %>
+<header class="sticky top-0 z-50 border-b border-gray-200/80 bg-white/95 shadow-sm backdrop-blur-md">
+  <%# Top accent bar %>
+  <div class="h-1 bg-gradient-to-r from-honda-red via-honda-red to-honda-gold"></div>
+
+  <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Main navigation">
+    <div class="flex h-16 items-center justify-between gap-4 lg:h-[4.5rem]">
+      <%# Logo %>
+      <%= link_to root_path, class: "group flex shrink-0 items-center gap-3" do %>
+        <% if current_settings.logo.attached? %>
+          <%= image_tag current_settings.logo, alt: current_settings.showroom_name, class: "h-10 w-auto object-contain lg:h-11" %>
+        <% else %>
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-honda-red text-sm font-bold text-white shadow-sm lg:h-11 lg:w-11 lg:text-base">
+            H
+          </div>
+        <% end %>
+        <div class="hidden sm:block">
+          <p class="font-display text-base font-bold leading-tight text-honda-dark group-hover:text-honda-red lg:text-lg"><%= current_settings.showroom_name %></p>
+          <p class="text-xs font-medium uppercase tracking-wider text-honda-red">Authorized Honda Dealer</p>
+        </div>
+      <% end %>
+
+      <%# Desktop links %>
+      <div class="hidden items-center gap-1 xl:flex">
+        <% [
+          [ "Home", root_path ],
+          [ "Bikes", bikes_path ],
+          [ "Offers", offers_path ],
+          [ "Accessories", accessories_path ],
+          [ "Finance", finance_path ],
+          [ "Insurance", insurance_path ],
+          [ "Service", new_service_booking_path ],
+          [ "About", about_path ],
+          [ "Contact", contact_path ]
+        ].each do |label, path| %>
+          <%= link_to label, path,
+                class: "rounded-lg px-3 py-2 text-sm font-medium transition #{public_nav_active?(path) ? 'bg-red-50 text-honda-red' : 'text-gray-700 hover:bg-gray-50 hover:text-honda-red'}" %>
+        <% end %>
+      </div>
+
+      <%# CTA + mobile toggle %>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <% if current_settings.phone.present? %>
+          <a href="tel:<%= current_settings.phone.gsub(/\s/, '') %>"
+             class="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-honda-dark transition hover:text-honda-red md:inline-flex">
+            <svg class="h-4 w-4 text-honda-red" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/>
+            </svg>
+            <%= current_settings.phone %>
+          </a>
+        <% end %>
+
+        <%= link_to new_test_ride_path, class: "btn-primary hidden px-4 py-2 text-sm sm:inline-flex" do %>
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+          </svg>
+          Book Test Ride
+        <% end %>
+
+        <button type="button"
+                data-controller="mobile-nav"
+                data-action="mobile-nav#toggle"
+                data-mobile-nav-target="toggle"
+                class="inline-flex items-center justify-center rounded-lg p-2 text-gray-600 hover:bg-gray-100 hover:text-honda-dark xl:hidden"
+                aria-expanded="false"
+                aria-controls="mobile-menu"
+                aria-label="Open menu">
+          <svg data-mobile-nav-target="openIcon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+          </svg>
+          <svg data-mobile-nav-target="closeIcon" class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <%# Mobile menu %>
+    <div id="mobile-menu"
+         data-mobile-nav-target="menu"
+         class="hidden border-t border-gray-100 pb-4 xl:hidden">
+      <div class="grid gap-1 pt-3 sm:grid-cols-2">
+        <% [
+          [ "Home", root_path ],
+          [ "Bikes", bikes_path ],
+          [ "Offers", offers_path ],
+          [ "Accessories", accessories_path ],
+          [ "Finance", finance_path ],
+          [ "Insurance", insurance_path ],
+          [ "Book Service", new_service_booking_path ],
+          [ "About Us", about_path ],
+          [ "Contact", contact_path ]
+        ].each do |label, path| %>
+          <%= link_to label, path,
+                class: "rounded-lg px-4 py-2.5 text-sm font-medium #{public_nav_active?(path) ? 'bg-red-50 text-honda-red' : 'text-gray-700 hover:bg-gray-50'}" %>
+        <% end %>
+      </div>
+      <div class="mt-3 px-2">
+        <%= link_to new_test_ride_path, class: "btn-primary w-full justify-center py-3" do %>
+          Book Test Ride
+        <% end %>
+      </div>
+    </div>
+  </nav>
+</header>

@@ -1,0 +1,36 @@
+<% content_for :title, "Enquiry" %>
+<% content_for :meta_description, "Send an enquiry to #{current_settings.showroom_name} about Honda bikes, offers, finance, insurance, or service." %>
+
+<section class="border-b border-gray-200 bg-white">
+  <div class="mx-auto max-w-3xl px-4 py-10 text-center sm:px-6 lg:px-8 lg:py-14">
+    <p class="text-sm font-semibold uppercase tracking-widest text-honda-red">Contact Sales</p>
+    <h1 class="mt-2 font-display text-3xl font-bold text-honda-dark sm:text-4xl">Send an Enquiry</h1>
+    <p class="mt-4 text-gray-600">Have a question about a Honda model, offer, or service? Our team will get back to you within 24 hours.</p>
+  </div>
+</section>
+
+<div class="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+  <div class="card p-6 sm:p-8">
+    <%= render "public/shared/enquiry_form",
+          enquiry: @enquiry,
+          bikes: @bikes,
+          form_url: enquiries_path,
+          show_bike_field: true,
+          submit_label: "Submit Enquiry" %>
+  </div>
+
+  <div class="mt-8 rounded-xl bg-honda-dark p-6 text-center text-white sm:p-8">
+    <h2 class="font-display text-lg font-semibold">Prefer a faster response?</h2>
+    <p class="mt-2 text-sm text-gray-300">Call or WhatsApp us directly for immediate assistance.</p>
+    <div class="mt-5 flex flex-wrap justify-center gap-3">
+      <% if current_settings.phone.present? %>
+        <a href="tel:<%= current_settings.phone.gsub(/\s/, '') %>" class="btn-primary">
+          Call <%= current_settings.phone %>
+        </a>
+      <% end %>
+      <% if current_settings.whatsapp.present? %>
+        <%= link_to "WhatsApp Us", whatsapp_url(current_settings.whatsapp), target: "_blank", rel: "noopener noreferrer", class: "btn-outline-light" %>
+      <% end %>
+    </div>
+  </div>
+</div>

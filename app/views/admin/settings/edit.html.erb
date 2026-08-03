@@ -1,0 +1,82 @@
+<% content_for :page_title, "Settings" %>
+<% content_for :page_subtitle, "Showroom and contact configuration" %>
+
+<%= form_with model: @setting, url: admin_settings_path, method: :patch, class: "space-y-6" do |f| %>
+  <% if @setting.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-4">
+      <h3 class="text-sm font-semibold text-red-800"><%= pluralize(@setting.errors.count, "error") %> prohibited settings from being saved:</h3>
+      <ul class="mt-2 list-inside list-disc text-sm text-red-700">
+        <% @setting.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Branding</h2>
+    <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div>
+        <%= f.label :showroom_name, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :showroom_name, class: "input-field", required: true %>
+      </div>
+      <div>
+        <%= f.label :logo, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <% if @setting.logo.attached? %>
+          <div class="mb-3"><%= image_tag @setting.logo, class: "h-16 w-auto rounded-lg border border-gray-200 bg-white p-2" %></div>
+        <% end %>
+        <%= f.file_field :logo, accept: "image/*", class: "block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-honda-red file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-red-700" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Contact Information</h2>
+    <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div class="md:col-span-2">
+        <%= f.label :address, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :address, rows: 3, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :phone, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.telephone_field :phone, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :email, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.email_field :email, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :whatsapp, "WhatsApp Number", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.telephone_field :whatsapp, class: "input-field" %>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :google_map_link, "Google Maps Link", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.url_field :google_map_link, class: "input-field", placeholder: "https://maps.google.com/..." %>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :business_hours, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :business_hours, rows: 4, class: "input-field", placeholder: "Mon–Sat: 9:00 AM – 7:00 PM" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Social Media</h2>
+    <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div>
+        <%= f.label :facebook, "Facebook URL", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.url_field :facebook, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :instagram, "Instagram URL", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.url_field :instagram, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :youtube, "YouTube URL", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.url_field :youtube, class: "input-field" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= f.submit "Save Settings", class: "btn-primary cursor-pointer" %>
+  </div>
+<% end %>

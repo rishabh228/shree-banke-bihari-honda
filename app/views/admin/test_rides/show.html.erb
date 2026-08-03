@@ -1,0 +1,41 @@
+<% content_for :page_title, "Test Ride ##{@test_ride.id}" %>
+<% content_for :page_subtitle, @test_ride.name %>
+
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <%= render "shared/status_badge", status: @test_ride.status %>
+  <div class="flex flex-wrap gap-2">
+    <%= link_to "Edit", edit_admin_test_ride_path(@test_ride), class: "btn-secondary" %>
+    <%= button_to "Delete", admin_test_ride_path(@test_ride), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "rounded-lg border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100" %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <div class="lg:col-span-2 card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Booking Details</h2>
+    <dl class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div><dt class="text-xs text-gray-500">Customer Name</dt><dd class="text-sm font-medium"><%= @test_ride.name %></dd></div>
+      <div><dt class="text-xs text-gray-500">Phone</dt><dd class="text-sm font-medium"><%= @test_ride.phone %></dd></div>
+      <div><dt class="text-xs text-gray-500">Email</dt><dd class="text-sm font-medium"><%= @test_ride.email.presence || "—" %></dd></div>
+      <div><dt class="text-xs text-gray-500">Bike</dt><dd class="text-sm font-medium"><%= @test_ride.bike.name %></dd></div>
+      <div><dt class="text-xs text-gray-500">Preferred Date</dt><dd class="text-sm font-medium"><%= @test_ride.preferred_date.strftime("%d %b %Y") %></dd></div>
+      <div><dt class="text-xs text-gray-500">Preferred Time</dt><dd class="text-sm font-medium"><%= @test_ride.preferred_time.presence || "—" %></dd></div>
+      <div><dt class="text-xs text-gray-500">Submitted</dt><dd class="text-sm font-medium"><%= @test_ride.created_at.strftime("%d %b %Y, %I:%M %p") %></dd></div>
+    </dl>
+    <% if @test_ride.remarks.present? %>
+      <div class="mt-6 border-t border-gray-200 pt-4">
+        <dt class="text-xs text-gray-500">Remarks</dt>
+        <dd class="mt-2 text-sm text-gray-700"><%= simple_format @test_ride.remarks %></dd>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Update Status</h2>
+    <p class="mt-1 text-sm text-gray-500">Transition to a new status</p>
+    <div class="mt-4 space-y-2">
+      <% TestRide.statuses.keys.reject { |s| s == @test_ride.status }.each do |status| %>
+        <%= button_to status.humanize.titleize, transition_admin_test_ride_path(@test_ride, status: status), method: :patch, class: "w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50" %>
+      <% end %>
+    </div>
+  </div>
+</div>

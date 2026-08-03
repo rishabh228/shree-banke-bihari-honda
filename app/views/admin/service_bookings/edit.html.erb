@@ -1,0 +1,70 @@
+<% content_for :page_title, "Edit Service Booking" %>
+<% content_for :page_subtitle, @service_booking.customer_name %>
+
+<%= form_with model: [:admin, @service_booking], class: "space-y-6" do |f| %>
+  <% if @service_booking.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-4">
+      <ul class="list-inside list-disc text-sm text-red-700">
+        <% @service_booking.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card p-6">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div>
+        <%= f.label :customer_name, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :customer_name, class: "input-field", required: true %>
+      </div>
+      <div>
+        <%= f.label :phone, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :phone, class: "input-field", required: true %>
+      </div>
+      <div>
+        <%= f.label :email, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.email_field :email, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :vehicle_number, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :vehicle_number, class: "input-field", required: true %>
+      </div>
+      <div>
+        <%= f.label :bike_model, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :bike_model, class: "input-field", required: true %>
+      </div>
+      <div>
+        <%= f.label :purchase_year, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.number_field :purchase_year, min: 1990, max: Date.current.year + 1, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :service_type, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.select :service_type, ServiceBooking::SERVICE_TYPES.map { |t| [t.humanize.titleize, t] }, {}, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :preferred_date, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.date_field :preferred_date, class: "input-field", required: true %>
+      </div>
+      <div>
+        <%= f.label :status, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.select :status, ServiceBooking.statuses.keys.map { |s| [s.humanize.titleize, s] }, {}, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :assigned_to_id, "Assign Advisor", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.collection_select :assigned_to_id,
+              @service_advisors,
+              :id, :name,
+              { include_blank: "Select advisor..." },
+              class: "input-field" %>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :complaint, "Complaint / Notes", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :complaint, rows: 4, class: "input-field" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= f.submit "Save Changes", class: "btn-primary cursor-pointer" %>
+    <%= link_to "Cancel", admin_service_booking_path(@service_booking), class: "btn-secondary" %>
+  </div>
+<% end %>

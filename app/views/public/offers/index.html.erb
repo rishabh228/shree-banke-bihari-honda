@@ -1,0 +1,87 @@
+<% content_for :title, "Offers & Promotions" %>
+<% content_for :meta_description, "Exclusive Honda offers and promotions at #{current_settings.showroom_name}. Limited-time deals on bikes, finance, and exchange." %>
+
+<section class="border-b border-gray-200 bg-gradient-to-br from-honda-dark to-gray-900">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+    <p class="text-sm font-semibold uppercase tracking-widest text-honda-gold">Save More</p>
+    <h1 class="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">Current Offers &amp; Promotions</h1>
+    <p class="mt-4 max-w-2xl text-gray-300">Grab the best deals on Honda two-wheelers — exchange bonuses, festive discounts, and special finance schemes.</p>
+  </div>
+</section>
+
+<div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+  <% if @offers.any? %>
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <% @offers.each do |offer| %>
+        <article class="card group flex flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-xl">
+          <div class="relative aspect-[16/10] overflow-hidden bg-honda-dark">
+            <% if offer.banner.attached? %>
+              <%= image_tag offer.banner, alt: offer.title, class: "h-full w-full object-cover transition duration-500 group-hover:scale-105" %>
+            <% else %>
+              <div class="flex h-full flex-col items-center justify-center bg-gradient-to-br from-honda-red to-honda-dark p-6 text-center">
+                <span class="font-display text-5xl font-bold text-white/20">%</span>
+                <p class="mt-2 font-display text-xl font-bold text-white"><%= offer.title %></p>
+              </div>
+            <% end %>
+            <div class="absolute left-4 top-4 rounded-full bg-honda-gold px-3 py-1 text-xs font-bold uppercase tracking-wide text-honda-dark">
+              Active Offer
+            </div>
+          </div>
+
+          <div class="flex flex-1 flex-col p-6">
+            <h2 class="font-display text-xl font-semibold text-honda-dark"><%= offer.title %></h2>
+
+            <% if offer.bike.present? %>
+              <p class="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-honda-red">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+                <%= offer.bike.name %>
+              </p>
+            <% end %>
+
+            <% if offer.description.present? %>
+              <p class="mt-3 flex-1 text-sm leading-relaxed text-gray-600"><%= offer.description %></p>
+            <% end %>
+
+            <% if offer.end_date.present? %>
+              <p class="mt-4 text-xs font-medium text-gray-400">
+                Valid until <%= offer.end_date.strftime("%d %b %Y") %>
+              </p>
+            <% end %>
+
+            <div class="mt-6 flex flex-col gap-2 sm:flex-row">
+              <% if offer.bike.present? %>
+                <%= link_to "View Bike", bike_path(offer.bike), class: "btn-secondary flex-1 justify-center text-sm" %>
+              <% end %>
+              <%= link_to "Enquire Now",
+                    new_enquiry_path(bike_id: offer.bike_id, source: "general"),
+                    class: "btn-primary flex-1 justify-center text-sm" %>
+            </div>
+          </div>
+        </article>
+      <% end %>
+    </div>
+
+    <% if @pagy.pages > 1 %>
+      <nav class="mt-12 flex justify-center" aria-label="Offers pagination">
+        <%== pagy_nav(@pagy) %>
+      </nav>
+    <% end %>
+  <% else %>
+    <div class="mx-auto max-w-lg">
+      <%= render "shared/empty_state",
+            title: "No Active Offers",
+            message: "There are no promotions running right now. Contact our sales team for the best available price on any Honda model.",
+            cta_text: "Contact Us",
+            cta_path: contact_path %>
+    </div>
+  <% end %>
+
+  <div class="mt-16 rounded-2xl bg-red-50 p-8 text-center sm:p-10">
+    <h2 class="font-display text-xl font-bold text-honda-dark">Don&rsquo;t miss the next offer</h2>
+    <p class="mt-2 text-sm text-gray-600">Visit our showroom or follow us on social media for the latest promotions.</p>
+    <div class="mt-6 flex flex-wrap justify-center gap-3">
+      <%= link_to "Browse Bikes", bikes_path, class: "btn-primary" %>
+      <%= link_to "Book Test Ride", new_test_ride_path, class: "btn-secondary" %>
+    </div>
+  </div>
+</div>

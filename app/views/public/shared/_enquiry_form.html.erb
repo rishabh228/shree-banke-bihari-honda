@@ -1,0 +1,70 @@
+<%# locals: (enquiry:, bikes: nil, form_url: nil, submit_label: "Submit Enquiry", show_bike_field: false, show_message: true, form_id: nil) %>
+<% form_url ||= enquiries_path %>
+<% form_id ||= "enquiry-form-#{enquiry.source}" %>
+
+<%= form_with model: enquiry, url: form_url, local: true, html: { id: form_id, class: "space-y-5" } do |f| %>
+  <%= f.hidden_field :source %>
+
+  <% if enquiry.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3" role="alert">
+      <p class="text-sm font-semibold text-red-800">Please fix the following:</p>
+      <ul class="mt-2 list-inside list-disc text-sm text-red-700">
+        <% enquiry.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <%= f.label :name, "Full Name", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :name, required: true, autocomplete: "name", class: "input-field #{'border-red-300 focus:border-red-500 focus:ring-red-500/20' if enquiry.errors[:name].any?}", placeholder: "Your name" %>
+      <% enquiry.errors.full_messages_for(:name).each do |message| %>
+        <p class="mt-1 text-xs text-red-600"><%= message %></p>
+      <% end %>
+    </div>
+
+    <div>
+      <%= f.label :phone, "Phone Number", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+      <%= f.telephone_field :phone, required: true, autocomplete: "tel", class: "input-field #{'border-red-300 focus:border-red-500 focus:ring-red-500/20' if enquiry.errors[:phone].any?}", placeholder: "10-digit mobile number" %>
+      <% enquiry.errors.full_messages_for(:phone).each do |message| %>
+        <p class="mt-1 text-xs text-red-600"><%= message %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :email, "Email (optional)", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+    <%= f.email_field :email, autocomplete: "email", class: "input-field #{'border-red-300 focus:border-red-500 focus:ring-red-500/20' if enquiry.errors[:email].any?}", placeholder: "you@example.com" %>
+    <% enquiry.errors.full_messages_for(:email).each do |message| %>
+      <p class="mt-1 text-xs text-red-600"><%= message %></p>
+    <% end %>
+  </div>
+
+  <% if show_bike_field && bikes.present? %>
+    <div>
+      <%= f.label :bike_id, "Interested Model", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+      <%= f.collection_select :bike_id, bikes, :id, :name,
+            { include_blank: "Select a bike (optional)" },
+            class: "input-field #{'border-red-300 focus:border-red-500 focus:ring-red-500/20' if enquiry.errors[:bike_id].any?}" %>
+      <% enquiry.errors.full_messages_for(:bike_id).each do |message| %>
+        <p class="mt-1 text-xs text-red-600"><%= message %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if show_message %>
+    <div>
+      <%= f.label :message, "Message", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+      <%= f.text_area :message, rows: 4, class: "input-field resize-y #{'border-red-300 focus:border-red-500 focus:ring-red-500/20' if enquiry.errors[:message].any?}", placeholder: "Tell us how we can help you..." %>
+      <% enquiry.errors.full_messages_for(:message).each do |message| %>
+        <p class="mt-1 text-xs text-red-600"><%= message %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="pt-1">
+    <%= f.submit submit_label, class: "btn-primary w-full sm:w-auto" %>
+  </div>
+<% end %>

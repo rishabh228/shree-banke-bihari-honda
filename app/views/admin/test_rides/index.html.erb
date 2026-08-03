@@ -1,0 +1,75 @@
+<% content_for :page_title, "Test Rides" %>
+<% content_for :page_subtitle, "Manage test ride bookings" %>
+
+<% current_status = params.dig(:q, :status_eq) %>
+
+<div class="mb-6 flex flex-col gap-4">
+  <div class="flex flex-wrap gap-2">
+    <%= link_to "All", admin_test_rides_path,
+          class: "rounded-lg px-4 py-2 text-sm font-semibold #{current_status.blank? ? 'bg-honda-red text-white' : 'bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50'}" %>
+    <% TestRide.statuses.each do |key, value| %>
+      <%= link_to key.humanize.titleize, admin_test_rides_path(q: { status_eq: value }),
+            class: "rounded-lg px-4 py-2 text-sm font-semibold #{current_status.present? && current_status.to_i == value ? 'bg-honda-red text-white' : 'bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50'}" %>
+    <% end %>
+  </div>
+
+  <%= search_form_for @q, url: admin_test_rides_path, class: "flex flex-wrap items-end gap-3" do |f| %>
+    <%= f.hidden_field :status_eq if current_status.present? %>
+    <div>
+      <%= f.label :name_cont, "Customer", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.search_field :name_cont, class: "input-field w-44", placeholder: "Name..." %>
+    </div>
+    <div>
+      <%= f.label :phone_cont, "Phone", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.search_field :phone_cont, class: "input-field w-40", placeholder: "Phone..." %>
+    </div>
+    <div>
+      <%= f.label :bike_id_eq, "Bike", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.collection_select :bike_id_eq, Bike.order(:name), :id, :name, { include_blank: "All" }, class: "input-field w-44" %>
+    </div>
+    <div class="flex gap-2">
+      <%= f.submit "Search", class: "btn-primary" %>
+      <%= link_to "Reset", admin_test_rides_path, class: "btn-secondary" %>
+    </div>
+  <% end %>
+</div>
+
+<% if @test_rides.any? %>
+  <div class="card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Customer</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Bike</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Preferred Date</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Time</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Status</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <% @test_rides.each do |test_ride| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4">
+                <div class="text-sm font-medium text-honda-dark"><%= test_ride.name %></div>
+                <div class="text-sm text-gray-500"><%= test_ride.phone %></div>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-700"><%= test_ride.bike.name %></td>
+              <td class="px-6 py-4 text-sm text-gray-700"><%= test_ride.preferred_date.strftime("%d %b %Y") %></td>
+              <td class="px-6 py-4 text-sm text-gray-500"><%= test_ride.preferred_time.presence || "—" %></td>
+              <td class="px-6 py-4"><%= render "shared/status_badge", status: test_ride.status %></td>
+              <td class="px-6 py-4 text-right text-sm">
+                <%= link_to "View", admin_test_ride_path(test_ride), class: "font-semibold text-honda-red hover:text-red-700" %>
+                <%= link_to "Edit", edit_admin_test_ride_path(test_ride), class: "ml-3 font-semibold text-gray-600 hover:text-honda-dark" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% if @pagy.pages > 1 %><div class="mt-6 flex justify-center"><%== pagy_nav(@pagy) %></div><% end %>
+<% else %>
+  <%= render "shared/empty_state", title: "No test rides found", message: "Test ride requests from customers will appear here.", icon: "search" %>
+<% end %>

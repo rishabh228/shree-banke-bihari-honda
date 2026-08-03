@@ -1,0 +1,41 @@
+<%= form_with model: [:admin, media_asset], class: "space-y-6" do |f| %>
+  <% if media_asset.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-4">
+      <ul class="list-inside list-disc text-sm text-red-700">
+        <% media_asset.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card p-6">
+    <div class="grid grid-cols-1 gap-6">
+      <div>
+        <%= f.label :title, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :title, class: "input-field", required: true %>
+      </div>
+      <div>
+        <%= f.label :description, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :description, rows: 3, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :file, "Upload File", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <% if media_asset.file.attached? %>
+          <div class="mb-3">
+            <% if media_asset.file_type == "image" %>
+              <%= image_tag media_asset.file, class: "h-32 rounded-lg object-cover" %>
+            <% else %>
+              <p class="text-sm text-gray-600">Current: <%= media_asset.file.filename %> (<%= media_asset.file.content_type %>)</p>
+            <% end %>
+          </div>
+        <% end %>
+        <%= f.file_field :file, class: "block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-honda-red file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-red-700" %>
+        <p class="mt-1 text-xs text-gray-500">Images and documents (PDF, etc.) are supported.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= f.submit class: "btn-primary cursor-pointer" %>
+    <%= link_to "Cancel", admin_media_assets_path, class: "btn-secondary" %>
+  </div>
+<% end %>

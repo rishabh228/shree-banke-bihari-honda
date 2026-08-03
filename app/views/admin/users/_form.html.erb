@@ -1,0 +1,43 @@
+<%= form_with model: [:admin, user], class: "space-y-6" do |f| %>
+  <% if user.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-4">
+      <ul class="list-inside list-disc text-sm text-red-700">
+        <% user.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card p-6">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div>
+        <%= f.label :name, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :name, class: "input-field", required: true %>
+      </div>
+      <div>
+        <%= f.label :email, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.email_field :email, class: "input-field", required: true, autocomplete: "off" %>
+      </div>
+      <div>
+        <%= f.label :role, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.select :role, User.roles.keys.map { |r| [r.humanize.titleize, r] }, {}, class: "input-field" %>
+      </div>
+      <div></div>
+      <div>
+        <%= f.label :password, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.password_field :password, class: "input-field", autocomplete: "new-password", placeholder: (user.persisted? ? "Leave blank to keep current" : "") %>
+      </div>
+      <div>
+        <%= f.label :password_confirmation, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.password_field :password_confirmation, class: "input-field", autocomplete: "new-password" %>
+      </div>
+    </div>
+    <% if user.persisted? %>
+      <p class="mt-4 text-xs text-gray-500">Leave password fields blank to keep the current password.</p>
+    <% end %>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= f.submit class: "btn-primary cursor-pointer" %>
+    <%= link_to "Cancel", admin_users_path, class: "btn-secondary" %>
+  </div>
+<% end %>

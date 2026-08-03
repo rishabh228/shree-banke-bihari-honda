@@ -1,0 +1,50 @@
+<% content_for :page_title, "Edit Enquiry" %>
+<% content_for :page_subtitle, @enquiry.name %>
+
+<%= form_with model: [:admin, @enquiry], class: "space-y-6" do |f| %>
+  <% if @enquiry.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-4">
+      <ul class="list-inside list-disc text-sm text-red-700">
+        <% @enquiry.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card p-6">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div>
+        <%= f.label :name, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :name, class: "input-field", required: true %>
+      </div>
+      <div>
+        <%= f.label :phone, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :phone, class: "input-field", required: true %>
+      </div>
+      <div>
+        <%= f.label :email, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.email_field :email, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :source, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.select :source, Enquiry.sources.keys.map { |s| [s.humanize.titleize, s] }, {}, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :bike_id, "Linked Bike", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.collection_select :bike_id, Bike.order(:name), :id, :name, { include_blank: "None" }, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :status, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.select :status, Enquiry.statuses.keys.map { |s| [s.humanize.titleize, s] }, {}, class: "input-field" %>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :message, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :message, rows: 5, class: "input-field" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= f.submit "Save Changes", class: "btn-primary cursor-pointer" %>
+    <%= link_to "Cancel", admin_enquiry_path(@enquiry), class: "btn-secondary" %>
+  </div>
+<% end %>

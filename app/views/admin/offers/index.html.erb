@@ -1,0 +1,72 @@
+<% content_for :page_title, "Offers" %>
+<% content_for :page_subtitle, "Manage promotional offers" %>
+
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <%= search_form_for @q, url: admin_offers_path, class: "flex flex-wrap items-end gap-3" do |f| %>
+    <div>
+      <%= f.label :title_cont, "Title", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.search_field :title_cont, class: "input-field w-48", placeholder: "Search..." %>
+    </div>
+    <div>
+      <%= f.label :active_eq, "Active", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.select :active_eq, [["Yes", true], ["No", false]], { include_blank: "All" }, class: "input-field w-32" %>
+    </div>
+    <div class="flex gap-2">
+      <%= f.submit "Search", class: "btn-primary" %>
+      <%= link_to "Reset", admin_offers_path, class: "btn-secondary" %>
+    </div>
+  <% end %>
+  <%= link_to "Add Offer", new_admin_offer_path, class: "btn-primary shrink-0" %>
+</div>
+
+<% if @offers.any? %>
+  <div class="card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Offer</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Bike</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Period</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Status</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <% @offers.each do |offer| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <% if offer.banner.attached? %>
+                    <%= image_tag offer.banner, class: "h-10 w-16 rounded object-cover" %>
+                  <% end %>
+                  <div class="text-sm font-semibold text-honda-dark"><%= offer.title %></div>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-700"><%= offer.bike&.name || "All Bikes" %></td>
+              <td class="px-6 py-4 text-sm text-gray-600">
+                <%= offer.start_date&.strftime("%d %b %Y") || "—" %> – <%= offer.end_date&.strftime("%d %b %Y") || "Open" %>
+              </td>
+              <td class="px-6 py-4">
+                <% if offer.expired? %>
+                  <%= render "shared/status_badge", status: "inactive", label: "Expired" %>
+                <% elsif offer.active? %>
+                  <%= render "shared/status_badge", status: "active", label: "Active" %>
+                <% else %>
+                  <%= render "shared/status_badge", status: "inactive", label: "Inactive" %>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 text-right text-sm">
+                <%= link_to "View", admin_offer_path(offer), class: "font-semibold text-honda-red hover:text-red-700" %>
+                <%= link_to "Edit", edit_admin_offer_path(offer), class: "ml-3 font-semibold text-gray-600 hover:text-honda-dark" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% if @pagy.pages > 1 %><div class="mt-6 flex justify-center"><%== pagy_nav(@pagy) %></div><% end %>
+<% else %>
+  <%= render "shared/empty_state", title: "No offers found", message: "Create promotional offers for your bikes.", cta_text: "Add Offer", cta_path: new_admin_offer_path %>
+<% end %>

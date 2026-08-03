@@ -1,0 +1,122 @@
+<% content_for :title, "Book Service" %>
+<% content_for :meta_description, "Book Honda service appointment at #{current_settings.showroom_name}. Free service, paid maintenance, warranty repairs, and genuine parts." %>
+
+<section class="border-b border-gray-200 bg-white">
+  <div class="mx-auto max-w-3xl px-4 py-10 text-center sm:px-6 lg:px-8 lg:py-14">
+    <p class="text-sm font-semibold uppercase tracking-widest text-honda-red">After Sales</p>
+    <h1 class="mt-2 font-display text-3xl font-bold text-honda-dark sm:text-4xl">Book a Service</h1>
+    <p class="mt-4 text-gray-600">Schedule your Honda&rsquo;s periodic service, repair, or warranty work. Our certified technicians use only genuine parts.</p>
+  </div>
+</section>
+
+<div class="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+  <div class="card p-6 sm:p-8">
+    <%= form_with model: @service_booking, url: service_bookings_path, local: true, html: { class: "space-y-5" } do |f| %>
+      <% if @service_booking.errors.any? %>
+        <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3" role="alert">
+          <p class="text-sm font-semibold text-red-800">Please fix the following:</p>
+          <ul class="mt-2 list-inside list-disc text-sm text-red-700">
+            <% @service_booking.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <%= f.label :customer_name, "Full Name", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :customer_name, required: true, autocomplete: "name", class: "input-field #{'border-red-300' if @service_booking.errors[:customer_name].any?}", placeholder: "Your name" %>
+          <% @service_booking.errors.full_messages_for(:customer_name).each do |message| %>
+            <p class="mt-1 text-xs text-red-600"><%= message %></p>
+          <% end %>
+        </div>
+
+        <div>
+          <%= f.label :phone, "Phone Number", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+          <%= f.telephone_field :phone, required: true, autocomplete: "tel", class: "input-field #{'border-red-300' if @service_booking.errors[:phone].any?}", placeholder: "10-digit mobile number" %>
+          <% @service_booking.errors.full_messages_for(:phone).each do |message| %>
+            <p class="mt-1 text-xs text-red-600"><%= message %></p>
+          <% end %>
+        </div>
+      </div>
+
+      <div>
+        <%= f.label :email, "Email (optional)", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+        <%= f.email_field :email, autocomplete: "email", class: "input-field", placeholder: "you@example.com" %>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <%= f.label :vehicle_number, "Vehicle Number", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :vehicle_number, required: true, class: "input-field uppercase #{'border-red-300' if @service_booking.errors[:vehicle_number].any?}", placeholder: "e.g. UP32AB1234" %>
+          <% @service_booking.errors.full_messages_for(:vehicle_number).each do |message| %>
+            <p class="mt-1 text-xs text-red-600"><%= message %></p>
+          <% end %>
+        </div>
+
+        <div>
+          <%= f.label :bike_model, "Bike Model", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :bike_model, required: true, class: "input-field #{'border-red-300' if @service_booking.errors[:bike_model].any?}", placeholder: "e.g. Activa 6G, Hornet 2.0" %>
+          <% @service_booking.errors.full_messages_for(:bike_model).each do |message| %>
+            <p class="mt-1 text-xs text-red-600"><%= message %></p>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <%= f.label :purchase_year, "Purchase Year (optional)", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+          <%= f.number_field :purchase_year, min: 1990, max: Date.current.year, class: "input-field", placeholder: Date.current.year.to_s %>
+        </div>
+
+        <div>
+          <%= f.label :service_type, "Service Type", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+          <%= f.select :service_type,
+                options_for_select([
+                  [ "Select service type", "" ],
+                  [ "Free Service", "free" ],
+                  [ "Paid Service", "paid" ],
+                  [ "Warranty Service", "warranty" ],
+                  [ "General Repair", "general" ]
+                ], @service_booking.service_type),
+                {},
+                { required: true, class: "input-field #{'border-red-300' if @service_booking.errors[:service_type].any?}" } %>
+          <% @service_booking.errors.full_messages_for(:service_type).each do |message| %>
+            <p class="mt-1 text-xs text-red-600"><%= message %></p>
+          <% end %>
+        </div>
+      </div>
+
+      <div>
+        <%= f.label :preferred_date, "Preferred Service Date", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+        <%= f.date_field :preferred_date, required: true, min: Date.current.to_s, class: "input-field #{'border-red-300' if @service_booking.errors[:preferred_date].any?}" %>
+        <% @service_booking.errors.full_messages_for(:preferred_date).each do |message| %>
+          <p class="mt-1 text-xs text-red-600"><%= message %></p>
+        <% end %>
+      </div>
+
+      <div>
+        <%= f.label :complaint, "Complaint / Service Details (optional)", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :complaint, rows: 4, class: "input-field resize-y", placeholder: "Describe the issue or service required..." %>
+      </div>
+
+      <div class="pt-2">
+        <%= f.submit "Book Service Appointment", class: "btn-primary w-full sm:w-auto" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-8 grid gap-4 sm:grid-cols-3">
+    <% [
+      [ "Genuine Parts", "OEM Honda spare parts only" ],
+      [ "Expert Technicians", "Factory-trained service team" ],
+      [ "Quick Turnaround", "Express service available" ]
+    ].each do |title, desc| %>
+      <div class="rounded-xl border border-gray-200 bg-white p-4 text-center">
+        <p class="font-display text-sm font-semibold text-honda-dark"><%= title %></p>
+        <p class="mt-1 text-xs text-gray-500"><%= desc %></p>
+      </div>
+    <% end %>
+  </div>
+</div>

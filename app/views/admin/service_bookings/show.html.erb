@@ -1,0 +1,55 @@
+<% content_for :page_title, "Service Booking ##{@service_booking.id}" %>
+<% content_for :page_subtitle, @service_booking.customer_name %>
+
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <%= render "shared/status_badge", status: @service_booking.status %>
+  <div class="flex flex-wrap gap-2">
+    <%= link_to "Edit", edit_admin_service_booking_path(@service_booking), class: "btn-secondary" %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <div class="lg:col-span-2 card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Booking Details</h2>
+    <dl class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div><dt class="text-xs text-gray-500">Customer</dt><dd class="text-sm font-medium"><%= @service_booking.customer_name %></dd></div>
+      <div><dt class="text-xs text-gray-500">Phone</dt><dd class="text-sm font-medium"><%= @service_booking.phone %></dd></div>
+      <div><dt class="text-xs text-gray-500">Email</dt><dd class="text-sm font-medium"><%= @service_booking.email.presence || "—" %></dd></div>
+      <div><dt class="text-xs text-gray-500">Vehicle Number</dt><dd class="text-sm font-medium"><%= @service_booking.vehicle_number %></dd></div>
+      <div><dt class="text-xs text-gray-500">Bike Model</dt><dd class="text-sm font-medium"><%= @service_booking.bike_model %></dd></div>
+      <div><dt class="text-xs text-gray-500">Purchase Year</dt><dd class="text-sm font-medium"><%= @service_booking.purchase_year.presence || "—" %></dd></div>
+      <div><dt class="text-xs text-gray-500">Service Type</dt><dd class="text-sm font-medium"><%= @service_booking.service_type.humanize.titleize %></dd></div>
+      <div><dt class="text-xs text-gray-500">Preferred Date</dt><dd class="text-sm font-medium"><%= @service_booking.preferred_date.strftime("%d %b %Y") %></dd></div>
+      <div><dt class="text-xs text-gray-500">Assigned Advisor</dt><dd class="text-sm font-medium"><%= @service_booking.assigned_to&.name || "Unassigned" %></dd></div>
+      <div><dt class="text-xs text-gray-500">Submitted</dt><dd class="text-sm font-medium"><%= @service_booking.created_at.strftime("%d %b %Y, %I:%M %p") %></dd></div>
+    </dl>
+    <% if @service_booking.complaint.present? %>
+      <div class="mt-6 border-t border-gray-200 pt-4">
+        <dt class="text-xs text-gray-500">Complaint / Notes</dt>
+        <dd class="mt-2 text-sm text-gray-700"><%= simple_format @service_booking.complaint %></dd>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="space-y-6">
+    <div class="card p-6">
+      <h2 class="font-display text-lg font-semibold text-honda-dark">Assign Advisor</h2>
+      <%= form_with url: assign_admin_service_booking_path(@service_booking), method: :patch, class: "mt-4 space-y-3" do %>
+        <%= select_tag :assigned_to_id,
+              options_from_collection_for_select(User.where(role: %i[service_advisor manager super_admin]).order(:name), :id, :name, @service_booking.assigned_to_id),
+              include_blank: "Select advisor...",
+              class: "input-field" %>
+        <%= submit_tag "Assign", class: "btn-primary w-full cursor-pointer" %>
+      <% end %>
+    </div>
+
+    <div class="card p-6">
+      <h2 class="font-display text-lg font-semibold text-honda-dark">Update Status</h2>
+      <div class="mt-4 space-y-2">
+        <% ServiceBooking.statuses.keys.reject { |s| s == @service_booking.status }.each do |status| %>
+          <%= button_to status.humanize.titleize, transition_admin_service_booking_path(@service_booking, status: status), method: :patch, class: "w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

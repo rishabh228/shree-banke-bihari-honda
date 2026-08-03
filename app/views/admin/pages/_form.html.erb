@@ -1,0 +1,41 @@
+<%= form_with model: [:admin, page], class: "space-y-6" do |f| %>
+  <% if page.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-4">
+      <h3 class="text-sm font-semibold text-red-800"><%= pluralize(page.errors.count, "error") %> prohibited this page from being saved:</h3>
+      <ul class="mt-2 list-inside list-disc text-sm text-red-700">
+        <% page.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card p-6">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div>
+        <%= f.label :title, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :title, class: "input-field", required: true %>
+      </div>
+      <div>
+        <%= f.label :slug, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :slug, class: "input-field", placeholder: "Auto-generated from title if blank" %>
+        <% if Page::PREDEFINED_SLUGS.any? %>
+          <p class="mt-1 text-xs text-gray-500">Suggested: <%= Page::PREDEFINED_SLUGS.join(", ") %></p>
+        <% end %>
+      </div>
+      <div class="md:col-span-2">
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <%= f.check_box :published, class: "rounded border-gray-300 text-honda-red focus:ring-honda-red" %>
+          Published (visible on website)
+        </label>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :body, "Page Content", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.rich_text_area :body, class: "min-h-[320px] rounded-lg border border-gray-300" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= f.submit class: "btn-primary cursor-pointer" %>
+    <%= link_to "Cancel", page.persisted? ? admin_page_path(page) : admin_pages_path, class: "btn-secondary" %>
+  </div>
+<% end %>

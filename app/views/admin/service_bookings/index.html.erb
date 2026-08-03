@@ -1,0 +1,72 @@
+<% content_for :page_title, "Service Bookings" %>
+<% content_for :page_subtitle, "Manage service appointments" %>
+
+<div class="mb-6">
+  <%= search_form_for @q, url: admin_service_bookings_path, class: "flex flex-wrap items-end gap-3" do |f| %>
+    <div>
+      <%= f.label :customer_name_cont, "Customer", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.search_field :customer_name_cont, class: "input-field w-44", placeholder: "Name..." %>
+    </div>
+    <div>
+      <%= f.label :vehicle_number_cont, "Vehicle No.", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.search_field :vehicle_number_cont, class: "input-field w-36", placeholder: "DL..." %>
+    </div>
+    <div>
+      <%= f.label :status_eq, "Status", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.select :status_eq, ServiceBooking.statuses.map { |k, v| [k.humanize.titleize, v] }, { include_blank: "All" }, class: "input-field w-40" %>
+    </div>
+    <div>
+      <%= f.label :service_type_eq, "Service Type", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.select :service_type_eq, ServiceBooking::SERVICE_TYPES.map { |t| [t.humanize.titleize, t] }, { include_blank: "All" }, class: "input-field w-36" %>
+    </div>
+    <div class="flex gap-2">
+      <%= f.submit "Search", class: "btn-primary" %>
+      <%= link_to "Reset", admin_service_bookings_path, class: "btn-secondary" %>
+    </div>
+  <% end %>
+</div>
+
+<% if @service_bookings.any? %>
+  <div class="card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Customer</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Vehicle</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Service</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Date</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Advisor</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Status</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <% @service_bookings.each do |booking| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4">
+                <div class="text-sm font-medium text-honda-dark"><%= booking.customer_name %></div>
+                <div class="text-sm text-gray-500"><%= booking.phone %></div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="text-sm text-gray-700"><%= booking.vehicle_number %></div>
+                <div class="text-xs text-gray-500"><%= booking.bike_model %></div>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-700"><%= booking.service_type.humanize.titleize %></td>
+              <td class="px-6 py-4 text-sm text-gray-700"><%= booking.preferred_date.strftime("%d %b %Y") %></td>
+              <td class="px-6 py-4 text-sm text-gray-600"><%= booking.assigned_to&.name || "—" %></td>
+              <td class="px-6 py-4"><%= render "shared/status_badge", status: booking.status %></td>
+              <td class="px-6 py-4 text-right text-sm">
+                <%= link_to "View", admin_service_booking_path(booking), class: "font-semibold text-honda-red hover:text-red-700" %>
+                <%= link_to "Edit", edit_admin_service_booking_path(booking), class: "ml-3 font-semibold text-gray-600 hover:text-honda-dark" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% if @pagy.pages > 1 %><div class="mt-6 flex justify-center"><%== pagy_nav(@pagy) %></div><% end %>
+<% else %>
+  <%= render "shared/empty_state", title: "No service bookings", message: "Customer service requests will appear here." %>
+<% end %>

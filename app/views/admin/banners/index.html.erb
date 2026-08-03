@@ -1,0 +1,74 @@
+<% content_for :page_title, "Banners" %>
+<% content_for :page_subtitle, "Manage homepage and section banners" %>
+
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <%= search_form_for @q, url: admin_banners_path, class: "flex flex-wrap items-end gap-3" do |f| %>
+    <div>
+      <%= f.label :title_cont, "Title", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.search_field :title_cont, class: "input-field w-44", placeholder: "Search..." %>
+    </div>
+    <div>
+      <%= f.label :section_eq, "Section", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.select :section_eq, Banner::SECTIONS.map { |s| [s.humanize.titleize, s] }, { include_blank: "All" }, class: "input-field w-36" %>
+    </div>
+    <div>
+      <%= f.label :active_eq, "Active", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.select :active_eq, [["Yes", true], ["No", false]], { include_blank: "All" }, class: "input-field w-32" %>
+    </div>
+    <div class="flex gap-2">
+      <%= f.submit "Search", class: "btn-primary" %>
+      <%= link_to "Reset", admin_banners_path, class: "btn-secondary" %>
+    </div>
+  <% end %>
+  <%= link_to "Add Banner", new_admin_banner_path, class: "btn-primary shrink-0" %>
+</div>
+
+<% if @banners.any? %>
+  <div class="card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Banner</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Section</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Position</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Status</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <% @banners.each do |banner| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <% if banner.image.attached? %>
+                    <%= image_tag banner.image, class: "h-12 w-20 rounded object-cover" %>
+                  <% else %>
+                    <div class="flex h-12 w-20 items-center justify-center rounded bg-gray-100 text-xs text-gray-400">No img</div>
+                  <% end %>
+                  <div>
+                    <div class="text-sm font-semibold text-honda-dark"><%= banner.title.presence || "Untitled" %></div>
+                    <% if banner.subtitle.present? %>
+                      <div class="text-xs text-gray-500"><%= banner.subtitle %></div>
+                    <% end %>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-700"><%= banner.section.humanize.titleize %></td>
+              <td class="px-6 py-4 text-sm text-gray-700"><%= banner.position %></td>
+              <td class="px-6 py-4">
+                <%= render "shared/status_badge", status: banner.active? ? "active" : "inactive", label: banner.active? ? "Active" : "Inactive" %>
+              </td>
+              <td class="px-6 py-4 text-right text-sm">
+                <%= link_to "Edit", edit_admin_banner_path(banner), class: "font-semibold text-honda-red hover:text-red-700" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% if @pagy.pages > 1 %><div class="mt-6 flex justify-center"><%== pagy_nav(@pagy) %></div><% end %>
+<% else %>
+  <%= render "shared/empty_state", title: "No banners found", message: "Add banners for your website sections.", cta_text: "Add Banner", cta_path: new_admin_banner_path %>
+<% end %>

@@ -1,0 +1,76 @@
+<% content_for :title, "Genuine Honda Accessories" %>
+<% content_for :meta_description, "Shop genuine Honda accessories at #{current_settings.showroom_name}. Helmets, covers, guards, and OEM parts in stock." %>
+
+<section class="border-b border-gray-200 bg-white">
+  <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+    <p class="text-sm font-semibold uppercase tracking-widest text-honda-red">Genuine Parts</p>
+    <h1 class="mt-2 font-display text-3xl font-bold text-honda-dark sm:text-4xl">Honda Accessories</h1>
+    <p class="mt-3 max-w-2xl text-gray-600">OEM-approved accessories to protect, personalize, and enhance your Honda. All items fitted by our trained technicians.</p>
+  </div>
+</section>
+
+<div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+  <% if @accessories.any? %>
+    <p class="mb-8 text-sm text-gray-500">
+      Showing <span class="font-semibold text-honda-dark"><%= @pagy.from %>–<%= @pagy.to %></span> of
+      <span class="font-semibold text-honda-dark"><%= @pagy.count %></span> accessories
+    </p>
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <% @accessories.each do |accessory| %>
+        <article class="card group flex flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-lg">
+          <div class="relative aspect-square overflow-hidden bg-gray-100">
+            <% if accessory.image.attached? %>
+              <%= image_tag accessory.image, alt: accessory.name, class: "h-full w-full object-cover transition duration-500 group-hover:scale-105" %>
+            <% else %>
+              <div class="flex h-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-gray-300">
+                <svg class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/>
+                </svg>
+              </div>
+            <% end %>
+            <% if accessory.stock <= 5 && accessory.stock.positive? %>
+              <span class="absolute right-3 top-3 rounded-full bg-amber-500 px-2.5 py-1 text-xs font-bold text-white">Only <%= accessory.stock %> left</span>
+            <% end %>
+          </div>
+
+          <div class="flex flex-1 flex-col p-5">
+            <h2 class="font-display text-lg font-semibold text-honda-dark group-hover:text-honda-red"><%= accessory.name %></h2>
+            <% if accessory.description.present? %>
+              <p class="mt-2 line-clamp-2 flex-1 text-sm text-gray-600"><%= accessory.description %></p>
+            <% end %>
+            <div class="mt-4 flex items-end justify-between">
+              <div>
+                <p class="text-xs font-medium uppercase tracking-wide text-gray-400">Price</p>
+                <p class="font-display text-xl font-bold text-honda-red"><%= format_price(accessory.price) %></p>
+              </div>
+              <%= link_to "Enquire", new_enquiry_path(source: "accessories"), class: "btn-secondary py-2 text-xs" %>
+            </div>
+          </div>
+        </article>
+      <% end %>
+    </div>
+
+    <% if @pagy.pages > 1 %>
+      <nav class="mt-12 flex justify-center" aria-label="Accessories pagination">
+        <%== pagy_nav(@pagy) %>
+      </nav>
+    <% end %>
+  <% else %>
+    <%= render "shared/empty_state",
+          title: "No Accessories Available",
+          message: "Our accessories catalogue is being updated. Contact us for availability and fitment options.",
+          cta_text: "Send Enquiry",
+          cta_path: new_enquiry_path(source: "accessories") %>
+  <% end %>
+
+  <div class="mt-16 grid gap-6 rounded-2xl bg-honda-dark p-8 text-white sm:grid-cols-2 sm:p-10">
+    <div>
+      <h2 class="font-display text-xl font-bold">Professional Fitment</h2>
+      <p class="mt-2 text-sm text-gray-300">All accessories are installed at our service centre by Honda-trained technicians using genuine mounting hardware.</p>
+    </div>
+    <div class="flex items-center justify-start sm:justify-end">
+      <%= link_to "Book Service", new_service_booking_path, class: "btn-primary" %>
+    </div>
+  </div>
+</div>

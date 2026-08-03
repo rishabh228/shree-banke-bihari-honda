@@ -1,0 +1,45 @@
+<% content_for :title, @page&.title.presence || "Terms of Service" %>
+
+<section class="border-b border-gray-200 bg-white">
+  <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+    <h1 class="font-display text-3xl font-bold text-honda-dark sm:text-4xl"><%= @page&.title.presence || "Terms of Service" %></h1>
+    <p class="mt-3 text-sm text-gray-500">Last updated: <%= (@page&.updated_at || Time.current).strftime("%d %B %Y") %></p>
+  </div>
+</section>
+
+<div class="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+  <% if @page&.body.present? %>
+    <article class="trix-content text-gray-600">
+      <%= @page.body %>
+    </article>
+  <% else %>
+    <article class="space-y-6 text-gray-600">
+      <p>Welcome to the website of <%= current_settings.showroom_name %>. By accessing or using this website, you agree to be bound by these Terms of Service. If you do not agree, please do not use this site.</p>
+
+      <h2>Use of Website</h2>
+      <p>This website is provided for informational purposes about our Honda dealership services, including bike sales, offers, finance, insurance, and after-sales service. Content on this site is subject to change without notice.</p>
+
+      <h2>Pricing &amp; Availability</h2>
+      <p>Prices, offers, and model availability displayed on this website are indicative and may vary. Final on-road prices, EMI calculations, and offer eligibility are confirmed only at our showroom or through direct communication with our sales team.</p>
+
+      <h2>Bookings &amp; Enquiries</h2>
+      <p>Submitting a test ride request, service booking, or enquiry through this website does not constitute a confirmed appointment. Our team will contact you to confirm availability and details.</p>
+
+      <h2>Intellectual Property</h2>
+      <p>Honda trademarks, logos, and product images are the property of Honda Motor Co., Ltd. and its affiliates. Other content on this site is owned by <%= current_settings.showroom_name %> and may not be reproduced without permission.</p>
+
+      <h2>Limitation of Liability</h2>
+      <p>We strive to keep information accurate and up to date but make no warranties regarding completeness or accuracy. <%= current_settings.showroom_name %> shall not be liable for any direct or indirect damages arising from use of this website.</p>
+
+      <h2>Governing Law</h2>
+      <p>These terms are governed by the laws of India. Any disputes shall be subject to the jurisdiction of courts in the city where our showroom is located.</p>
+
+      <h2>Contact</h2>
+      <p>For questions about these terms, please visit our <%= link_to "Contact", contact_path, class: "text-honda-red hover:underline" %> page.</p>
+    </article>
+  <% end %>
+
+  <div class="mt-10 border-t border-gray-200 pt-8">
+    <%= link_to "&larr; Back to Home".html_safe, root_path, class: "text-sm font-medium text-honda-red hover:underline" %>
+  </div>
+</div>

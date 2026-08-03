@@ -1,0 +1,83 @@
+<% content_for :page_title, "Bikes" %>
+<% content_for :page_subtitle, "Manage bike catalog" %>
+
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <div>
+    <%= search_form_for @q, url: admin_bikes_path, class: "flex flex-wrap items-end gap-3" do |f| %>
+      <div>
+        <%= f.label :name_cont, "Name", class: "mb-1 block text-xs font-medium text-gray-500" %>
+        <%= f.search_field :name_cont, class: "input-field w-48", placeholder: "Search name..." %>
+      </div>
+      <div>
+        <%= f.label :category_cont, "Category", class: "mb-1 block text-xs font-medium text-gray-500" %>
+        <%= f.search_field :category_cont, class: "input-field w-40", placeholder: "Category..." %>
+      </div>
+      <div>
+        <%= f.label :status_eq, "Status", class: "mb-1 block text-xs font-medium text-gray-500" %>
+        <%= f.select :status_eq, Bike.statuses.map { |k, v| [k.humanize.titleize, v] }, { include_blank: "All" }, class: "input-field w-36" %>
+      </div>
+      <div class="flex gap-2">
+        <%= f.submit "Search", class: "btn-primary" %>
+        <%= link_to "Reset", admin_bikes_path, class: "btn-secondary" %>
+      </div>
+    <% end %>
+  </div>
+  <%= link_to "Add Bike", new_admin_bike_path, class: "btn-primary shrink-0" %>
+</div>
+
+<% if @bikes.any? %>
+  <div class="card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Bike</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Category</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Engine</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Starting Price</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <% @bikes.each do |bike| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <% if bike.thumbnail.attached? %>
+                    <%= image_tag bike.thumbnail, class: "h-12 w-16 rounded-lg object-cover" %>
+                  <% else %>
+                    <div class="flex h-12 w-16 items-center justify-center rounded-lg bg-gray-100 text-xs text-gray-400">No img</div>
+                  <% end %>
+                  <div>
+                    <div class="text-sm font-semibold text-honda-dark"><%= bike.name %></div>
+                    <div class="text-xs text-gray-500"><%= bike.slug %></div>
+                  </div>
+                </div>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700"><%= bike.category.presence || "—" %></td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700"><%= bike.engine.presence || "—" %></td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-honda-dark"><%= format_price(bike.starting_price) %></td>
+              <td class="whitespace-nowrap px-6 py-4"><%= render "shared/status_badge", status: bike.status %></td>
+              <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
+                <%= link_to "View", admin_bike_path(bike), class: "font-semibold text-honda-red hover:text-red-700" %>
+                <%= link_to "Edit", edit_admin_bike_path(bike), class: "ml-3 font-semibold text-gray-600 hover:text-honda-dark" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <% if @pagy.pages > 1 %>
+    <div class="mt-6 flex justify-center"><%== pagy_nav(@pagy) %></div>
+  <% end %>
+<% else %>
+  <%= render "shared/empty_state",
+        title: "No bikes found",
+        message: "Get started by adding your first bike to the catalog.",
+        icon: "bike",
+        cta_text: "Add Bike",
+        cta_path: new_admin_bike_path %>
+<% end %>

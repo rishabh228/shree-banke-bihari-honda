@@ -1,0 +1,110 @@
+<% content_for :title, "Book a Test Ride" %>
+<% content_for :meta_description, "Schedule a free Honda test ride at #{current_settings.showroom_name}. Experience your favourite model before you buy." %>
+
+<section class="border-b border-gray-200 bg-white">
+  <div class="mx-auto max-w-3xl px-4 py-10 text-center sm:px-6 lg:px-8 lg:py-14">
+    <p class="text-sm font-semibold uppercase tracking-widest text-honda-red">Experience Honda</p>
+    <h1 class="mt-2 font-display text-3xl font-bold text-honda-dark sm:text-4xl">Book a Test Ride</h1>
+    <p class="mt-4 text-gray-600">Fill in the form below and our team will confirm your test ride appointment. Same-day rides available on most models.</p>
+  </div>
+</section>
+
+<div class="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+  <div class="card p-6 sm:p-8">
+    <%= form_with model: @test_ride, url: test_rides_path, local: true, html: { class: "space-y-5" } do |f| %>
+      <% if @test_ride.errors.any? %>
+        <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3" role="alert">
+          <p class="text-sm font-semibold text-red-800">Please fix the following:</p>
+          <ul class="mt-2 list-inside list-disc text-sm text-red-700">
+            <% @test_ride.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <%= f.label :name, "Full Name", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :name, required: true, autocomplete: "name", class: "input-field #{'border-red-300' if @test_ride.errors[:name].any?}", placeholder: "Your name" %>
+          <% @test_ride.errors.full_messages_for(:name).each do |message| %>
+            <p class="mt-1 text-xs text-red-600"><%= message %></p>
+          <% end %>
+        </div>
+
+        <div>
+          <%= f.label :phone, "Phone Number", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+          <%= f.telephone_field :phone, required: true, autocomplete: "tel", class: "input-field #{'border-red-300' if @test_ride.errors[:phone].any?}", placeholder: "10-digit mobile number" %>
+          <% @test_ride.errors.full_messages_for(:phone).each do |message| %>
+            <p class="mt-1 text-xs text-red-600"><%= message %></p>
+          <% end %>
+        </div>
+      </div>
+
+      <div>
+        <%= f.label :email, "Email (optional)", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+        <%= f.email_field :email, autocomplete: "email", class: "input-field", placeholder: "you@example.com" %>
+      </div>
+
+      <div>
+        <%= f.label :bike_id, "Select Bike", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+        <%= f.collection_select :bike_id, @bikes, :id, :name,
+              { prompt: "Choose a model for test ride" },
+              { required: true, class: "input-field #{'border-red-300' if @test_ride.errors[:bike_id].any?}" } %>
+        <% @test_ride.errors.full_messages_for(:bike_id).each do |message| %>
+          <p class="mt-1 text-xs text-red-600"><%= message %></p>
+        <% end %>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <%= f.label :preferred_date, "Preferred Date", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+          <%= f.date_field :preferred_date, required: true, min: Date.current.to_s, class: "input-field #{'border-red-300' if @test_ride.errors[:preferred_date].any?}" %>
+          <% @test_ride.errors.full_messages_for(:preferred_date).each do |message| %>
+            <p class="mt-1 text-xs text-red-600"><%= message %></p>
+          <% end %>
+        </div>
+
+        <div>
+          <%= f.label :preferred_time, "Preferred Time", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+          <%= f.select :preferred_time,
+                options_for_select([
+                  [ "Select a time slot", "" ],
+                  [ "10:00 AM – 12:00 PM", "10:00-12:00" ],
+                  [ "12:00 PM – 2:00 PM", "12:00-14:00" ],
+                  [ "2:00 PM – 4:00 PM", "14:00-16:00" ],
+                  [ "4:00 PM – 6:00 PM", "16:00-18:00" ]
+                ], @test_ride.preferred_time),
+                {},
+                class: "input-field" %>
+        </div>
+      </div>
+
+      <div>
+        <%= f.label :remarks, "Remarks (optional)", class: "mb-1.5 block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :remarks, rows: 3, class: "input-field resize-y", placeholder: "Any specific requirements or questions..." %>
+      </div>
+
+      <div class="rounded-lg bg-gray-50 p-4 text-sm text-gray-600">
+        <p class="font-medium text-honda-dark">Please carry:</p>
+        <ul class="mt-2 list-inside list-disc space-y-1">
+          <li>Valid driving licence</li>
+          <li>Identity proof (Aadhaar / PAN)</li>
+        </ul>
+      </div>
+
+      <div class="pt-2">
+        <%= f.submit "Submit Test Ride Request", class: "btn-primary w-full sm:w-auto" %>
+      </div>
+    <% end %>
+  </div>
+
+  <p class="mt-6 text-center text-sm text-gray-500">
+    Prefer to call?
+    <% if current_settings.phone.present? %>
+      <a href="tel:<%= current_settings.phone.gsub(/\s/, '') %>" class="font-medium text-honda-red hover:underline"><%= current_settings.phone %></a>
+    <% else %>
+      <%= link_to "Contact us", contact_path, class: "font-medium text-honda-red hover:underline" %>
+    <% end %>
+  </p>
+</div>
