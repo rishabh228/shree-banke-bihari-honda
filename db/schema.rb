@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_03_070200) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_03_110000) do
   create_table "accessories", force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
@@ -106,6 +106,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_03_070200) do
     t.boolean "available", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "stock_quantity", default: 0, null: false
     t.index ["bike_id"], name: "index_bike_variants_on_bike_id"
   end
 
@@ -164,6 +165,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_03_070200) do
     t.bigint "notifiable_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "whatsapp_url"
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable_type_and_notifiable_id"
     t.index ["read_at"], name: "index_notifications_on_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
@@ -190,6 +192,42 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_03_070200) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["slug"], name: "index_pages_on_slug", unique: true
+  end
+
+  create_table "sales", force: :cascade do |t|
+    t.string "customer_name", null: false
+    t.string "phone", null: false
+    t.string "email"
+    t.text "address"
+    t.integer "bike_id", null: false
+    t.integer "bike_variant_id"
+    t.integer "sales_executive_id", null: false
+    t.integer "enquiry_id"
+    t.decimal "ex_showroom_price", precision: 12, scale: 2, default: "0.0"
+    t.decimal "insurance", precision: 12, scale: 2, default: "0.0"
+    t.decimal "rto", precision: 12, scale: 2, default: "0.0"
+    t.decimal "other_charges", precision: 12, scale: 2, default: "0.0"
+    t.decimal "total_price", precision: 12, scale: 2, default: "0.0"
+    t.decimal "booking_amount", precision: 12, scale: 2, default: "0.0"
+    t.integer "payment_mode", default: 0, null: false
+    t.string "finance_partner"
+    t.integer "status", default: 0, null: false
+    t.date "quoted_on"
+    t.date "booked_on"
+    t.date "delivery_date"
+    t.string "chassis_number"
+    t.string "engine_number"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bike_id"], name: "index_sales_on_bike_id"
+    t.index ["bike_variant_id"], name: "index_sales_on_bike_variant_id"
+    t.index ["booked_on"], name: "index_sales_on_booked_on"
+    t.index ["delivery_date"], name: "index_sales_on_delivery_date"
+    t.index ["enquiry_id"], name: "index_sales_on_enquiry_id"
+    t.index ["phone"], name: "index_sales_on_phone"
+    t.index ["sales_executive_id"], name: "index_sales_on_sales_executive_id"
+    t.index ["status"], name: "index_sales_on_status"
   end
 
   create_table "service_bookings", force: :cascade do |t|
@@ -224,6 +262,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_03_070200) do
     t.text "business_hours"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "whatsapp_notifications_enabled", default: true, null: false
   end
 
   create_table "test_rides", force: :cascade do |t|
@@ -264,6 +303,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_03_070200) do
   add_foreign_key "enquiries", "bikes"
   add_foreign_key "notifications", "users"
   add_foreign_key "offers", "bikes"
+  add_foreign_key "sales", "bike_variants"
+  add_foreign_key "sales", "bikes"
+  add_foreign_key "sales", "enquiries"
+  add_foreign_key "sales", "users", column: "sales_executive_id"
   add_foreign_key "service_bookings", "users", column: "assigned_to_id"
   add_foreign_key "test_rides", "bikes"
 end

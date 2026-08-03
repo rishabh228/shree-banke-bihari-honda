@@ -121,6 +121,7 @@
               <th scope="col" class="hidden px-4 py-3 text-right font-semibold text-honda-dark lg:table-cell sm:px-6">Insurance</th>
               <th scope="col" class="hidden px-4 py-3 text-right font-semibold text-honda-dark lg:table-cell sm:px-6">RTO</th>
               <th scope="col" class="px-4 py-3 text-right font-semibold text-honda-dark sm:px-6">On-Road Total</th>
+              <th scope="col" class="px-4 py-3 text-left font-semibold text-honda-dark sm:px-6">Availability</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
@@ -132,6 +133,7 @@
                 <td class="hidden px-4 py-4 text-right text-gray-600 lg:table-cell sm:px-6"><%= format_price(variant.insurance) %></td>
                 <td class="hidden px-4 py-4 text-right text-gray-600 lg:table-cell sm:px-6"><%= format_price(variant.rto) %></td>
                 <td class="px-4 py-4 text-right font-display font-bold text-honda-red sm:px-6"><%= format_price(variant.total_price) %></td>
+                <td class="px-4 py-4 sm:px-6"><%= stock_status_badge(variant) %></td>
               </tr>
             <% end %>
           </tbody>

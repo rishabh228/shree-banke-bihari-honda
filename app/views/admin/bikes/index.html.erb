@@ -19,10 +19,13 @@
       <div class="flex gap-2">
         <%= f.submit "Search", class: "btn-primary" %>
         <%= link_to "Reset", admin_bikes_path, class: "btn-secondary" %>
+        <%= render "shared/pdf_download_button", path: export_pdf_admin_bikes_path(q: params[:q]) %>
       </div>
     <% end %>
   </div>
+  <div class="flex shrink-0 gap-2">
   <%= link_to "Add Bike", new_admin_bike_path, class: "btn-primary shrink-0" %>
+  </div>
 </div>
 
 <% if @bikes.any? %>

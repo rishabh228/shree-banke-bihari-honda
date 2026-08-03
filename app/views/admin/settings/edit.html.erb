@@ -46,6 +46,13 @@
       <div>
         <%= f.label :whatsapp, "WhatsApp Number", class: "mb-1 block text-sm font-medium text-gray-700" %>
         <%= f.telephone_field :whatsapp, class: "input-field" %>
+        <p class="mt-1 text-xs text-gray-500">Used for customer chat and staff alert links (wa.me).</p>
+      </div>
+      <div class="md:col-span-2">
+        <label class="flex items-center gap-3 text-sm text-gray-700">
+          <%= f.check_box :whatsapp_notifications_enabled, class: "rounded border-gray-300 text-honda-red focus:ring-honda-red" %>
+          Enable WhatsApp staff alerts for new enquiries, test rides, service bookings, and sales
+        </label>
       </div>
       <div class="md:col-span-2">
         <%= f.label :google_map_link, "Google Maps Link", class: "mb-1 block text-sm font-medium text-gray-700" %>

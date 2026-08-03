@@ -1,0 +1,71 @@
+<%= form_with model: [:admin, sale], class: "space-y-8" do |f| %>
+  <% if sale.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      <ul class="list-disc pl-5"><% sale.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %></ul>
+    </div>
+  <% end %>
+
+  <div class="card p-6">
+    <h2 class="font-display mb-4 text-lg font-semibold text-honda-dark">Customer</h2>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div><%= f.label :customer_name, class: "mb-1 block text-sm font-medium" %><%= f.text_field :customer_name, class: "input-field w-full" %></div>
+      <div><%= f.label :phone, class: "mb-1 block text-sm font-medium" %><%= f.telephone_field :phone, class: "input-field w-full" %></div>
+      <div><%= f.label :email, class: "mb-1 block text-sm font-medium" %><%= f.email_field :email, class: "input-field w-full" %></div>
+      <div class="sm:col-span-2"><%= f.label :address, class: "mb-1 block text-sm font-medium" %><%= f.text_area :address, rows: 2, class: "input-field w-full" %></div>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display mb-4 text-lg font-semibold text-honda-dark">Vehicle & Executive</h2>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
+        <%= f.label :bike_id, "Bike", class: "mb-1 block text-sm font-medium" %>
+        <%= f.collection_select :bike_id, @bikes, :id, :name, { include_blank: "Select bike" }, class: "input-field w-full" %>
+      </div>
+      <div>
+        <%= f.label :bike_variant_id, "Variant", class: "mb-1 block text-sm font-medium" %>
+        <%= f.collection_select :bike_variant_id, @bike_variants, :id, ->(v) { "#{v.bike.name} — #{v.name} (#{v.color})" }, { include_blank: "Select variant" }, class: "input-field w-full" %>
+      </div>
+      <div>
+        <%= f.label :sales_executive_id, "Sales Executive", class: "mb-1 block text-sm font-medium" %>
+        <%= f.collection_select :sales_executive_id, @sales_executives, :id, :name, {}, class: "input-field w-full" %>
+      </div>
+      <div>
+        <%= f.label :status, class: "mb-1 block text-sm font-medium" %>
+        <%= f.select :status, Sale.statuses.map { |k, v| [k.humanize.titleize, k] }, {}, class: "input-field w-full" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display mb-4 text-lg font-semibold text-honda-dark">Pricing</h2>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div><%= f.label :ex_showroom_price, "Ex-Showroom", class: "mb-1 block text-sm font-medium" %><%= f.number_field :ex_showroom_price, step: 1, class: "input-field w-full" %></div>
+      <div><%= f.label :insurance, class: "mb-1 block text-sm font-medium" %><%= f.number_field :insurance, step: 1, class: "input-field w-full" %></div>
+      <div><%= f.label :rto, class: "mb-1 block text-sm font-medium" %><%= f.number_field :rto, step: 1, class: "input-field w-full" %></div>
+      <div><%= f.label :other_charges, "Other Charges", class: "mb-1 block text-sm font-medium" %><%= f.number_field :other_charges, step: 1, class: "input-field w-full" %></div>
+      <div><%= f.label :total_price, "Total On-Road", class: "mb-1 block text-sm font-medium" %><%= f.number_field :total_price, step: 1, class: "input-field w-full" %></div>
+      <div><%= f.label :booking_amount, "Booking Amount", class: "mb-1 block text-sm font-medium" %><%= f.number_field :booking_amount, step: 1, class: "input-field w-full" %></div>
+    </div>
+    <p class="mt-2 text-xs text-gray-500">Select a variant to auto-fill prices on save, or enter manually.</p>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display mb-4 text-lg font-semibold text-honda-dark">Payment & Delivery</h2>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div><%= f.label :payment_mode, class: "mb-1 block text-sm font-medium" %><%= f.select :payment_mode, Sale.payment_modes.map { |k, _| [k.humanize.titleize, k] }, {}, class: "input-field w-full" %></div>
+      <div><%= f.label :finance_partner, class: "mb-1 block text-sm font-medium" %><%= f.text_field :finance_partner, class: "input-field w-full", placeholder: "If finance" %></div>
+      <div><%= f.label :quoted_on, class: "mb-1 block text-sm font-medium" %><%= f.date_field :quoted_on, class: "input-field w-full" %></div>
+      <div><%= f.label :booked_on, class: "mb-1 block text-sm font-medium" %><%= f.date_field :booked_on, class: "input-field w-full" %></div>
+      <div><%= f.label :delivery_date, class: "mb-1 block text-sm font-medium" %><%= f.date_field :delivery_date, class: "input-field w-full" %></div>
+      <div><%= f.label :chassis_number, class: "mb-1 block text-sm font-medium" %><%= f.text_field :chassis_number, class: "input-field w-full" %></div>
+      <div><%= f.label :engine_number, class: "mb-1 block text-sm font-medium" %><%= f.text_field :engine_number, class: "input-field w-full" %></div>
+      <div class="sm:col-span-2"><%= f.label :notes, class: "mb-1 block text-sm font-medium" %><%= f.text_area :notes, rows: 3, class: "input-field w-full" %></div>
+    </div>
+  </div>
+
+  <div class="flex gap-3">
+    <%= f.submit sale.persisted? ? "Update Sale" : "Create Sale", class: "btn-primary cursor-pointer" %>
+    <%= link_to "Cancel", sale.persisted? ? admin_sale_path(sale) : admin_sales_path, class: "btn-secondary" %>
+  </div>
+<% end %>

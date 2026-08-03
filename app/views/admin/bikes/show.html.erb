@@ -53,6 +53,7 @@
                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Color</th>
                 <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-500">Ex-Showroom</th>
                 <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-500">Total</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Stock</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Available</th>
               </tr>
             </thead>
@@ -63,6 +64,7 @@
                   <td class="px-6 py-3 text-sm text-gray-600"><%= variant.color.presence || "—" %></td>
                   <td class="px-6 py-3 text-right text-sm text-gray-600"><%= format_price(variant.ex_showroom_price) %></td>
                   <td class="px-6 py-3 text-right text-sm font-semibold text-honda-dark"><%= format_price(variant.total_price) %></td>
+                  <td class="px-6 py-3 text-sm"><%= stock_status_badge(variant) %></td>
                   <td class="px-6 py-3 text-sm"><%= variant.available? ? "Yes" : "No" %></td>
                 </tr>
               <% end %>

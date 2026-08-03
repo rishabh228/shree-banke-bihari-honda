@@ -8,4 +8,8 @@ class Setting < ApplicationRecord
   def self.instance
     first || create!(showroom_name: "Shree Banke Bihari Honda")
   end
+
+  def whatsapp_notifications_enabled?
+    whatsapp_notifications_enabled != false
+  end
 end

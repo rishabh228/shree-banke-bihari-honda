@@ -27,6 +27,9 @@ Rails.application.routes.draw do
     root "dashboard#index"
 
     resources :bikes do
+      collection do
+        get :export_pdf
+      end
       member do
         patch :publish
         patch :hide
@@ -40,17 +43,44 @@ Rails.application.routes.draw do
       end
     end
     resources :service_bookings, only: [ :index, :show, :edit, :update, :destroy ] do
+      collection do
+        get :export_pdf
+      end
       member do
         patch :assign
         patch :transition
       end
     end
-    resources :enquiries, only: [ :index, :show, :edit, :update, :destroy ]
+    resources :enquiries, only: [ :index, :show, :edit, :update, :destroy ] do
+      collection do
+        get :export_pdf
+      end
+      member do
+        post :convert_to_sale
+      end
+    end
+    resources :sales do
+      collection do
+        get :export_pdf
+      end
+      member do
+        patch :transition
+        get :quotation_pdf
+      end
+    end
     resources :pages
     resources :banners
     resources :media_assets
     resource :settings, only: [ :show, :edit, :update ]
     resources :users
+    resources :notifications, only: [ :index ] do
+      member do
+        patch :mark_read
+      end
+      collection do
+        patch :mark_all_read
+      end
+    end
     get "reports", to: "reports#index"
   end
 end

@@ -23,6 +23,7 @@
       <div><dt class="text-xs text-gray-500">Phone</dt><dd class="text-sm font-medium"><%= @setting.phone.presence || "—" %></dd></div>
       <div><dt class="text-xs text-gray-500">Email</dt><dd class="text-sm font-medium"><%= @setting.email.presence || "—" %></dd></div>
       <div><dt class="text-xs text-gray-500">WhatsApp</dt><dd class="text-sm font-medium"><%= @setting.whatsapp.presence || "—" %></dd></div>
+      <div><dt class="text-xs text-gray-500">WhatsApp Staff Alerts</dt><dd class="text-sm font-medium"><%= @setting.whatsapp_notifications_enabled? ? "Enabled" : "Disabled" %></dd></div>
       <div><dt class="text-xs text-gray-500">Business Hours</dt><dd class="text-sm"><%= simple_format(@setting.business_hours.presence || "—") %></dd></div>
     </dl>
   </div>

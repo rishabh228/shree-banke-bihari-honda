@@ -1,0 +1,69 @@
+<% content_for :page_title, "Sale ##{@sale.id}" %>
+<% content_for :page_subtitle, @sale.customer_name %>
+
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <div class="flex flex-wrap items-center gap-3">
+    <%= render "shared/status_badge", status: @sale.status %>
+    <span class="text-sm text-gray-500"><%= @sale.display_payment_mode %></span>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <%= link_to "Download Quotation PDF", quotation_pdf_admin_sale_path(@sale), class: "btn-secondary", data: { turbo: false } %>
+    <%= link_to "Edit", edit_admin_sale_path(@sale), class: "btn-secondary" %>
+    <% if policy(@sale).destroy? %>
+      <%= button_to "Delete", admin_sale_path(@sale), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "rounded-lg border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700" %>
+    <% end %>
+  </div>
+</div>
+
+<% next_statuses = Sales::StatusTransitionService::ALLOWED[@sale.status] || [] %>
+<% if next_statuses.any? %>
+  <div class="card mb-6 p-4">
+    <p class="mb-3 text-sm font-medium text-gray-700">Update status</p>
+    <div class="flex flex-wrap gap-2">
+      <% next_statuses.each do |status| %>
+        <%= button_to status.humanize.titleize, transition_admin_sale_path(@sale, status: status), method: :patch, class: "btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Customer</h2>
+    <dl class="mt-4 space-y-3 text-sm">
+      <div><dt class="text-gray-500">Name</dt><dd class="font-medium"><%= @sale.customer_name %></dd></div>
+      <div><dt class="text-gray-500">Phone</dt><dd class="font-medium"><%= @sale.phone %></dd></div>
+      <div><dt class="text-gray-500">Email</dt><dd class="font-medium"><%= @sale.email.presence || "—" %></dd></div>
+      <div><dt class="text-gray-500">Address</dt><dd class="font-medium"><%= @sale.address.presence || "—" %></dd></div>
+    </dl>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Vehicle</h2>
+    <dl class="mt-4 space-y-3 text-sm">
+      <div><dt class="text-gray-500">Bike</dt><dd class="font-medium"><%= @sale.bike.name %></dd></div>
+      <div><dt class="text-gray-500">Variant</dt><dd class="font-medium"><%= @sale.bike_variant&.name || "—" %> <%= @sale.bike_variant&.color.present? ? "(#{@sale.bike_variant.color})" : "" %></dd></div>
+      <div><dt class="text-gray-500">Sales Executive</dt><dd class="font-medium"><%= @sale.sales_executive.name %></dd></div>
+      <div><dt class="text-gray-500">Chassis / Engine</dt><dd class="font-medium"><%= [@sale.chassis_number, @sale.engine_number].compact.join(" / ").presence || "—" %></dd></div>
+    </dl>
+  </div>
+
+  <div class="card p-6 lg:col-span-2">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Pricing</h2>
+    <dl class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 text-sm">
+      <div><dt class="text-gray-500">Ex-Showroom</dt><dd class="font-medium"><%= format_price(@sale.ex_showroom_price) %></dd></div>
+      <div><dt class="text-gray-500">Insurance</dt><dd class="font-medium"><%= format_price(@sale.insurance) %></dd></div>
+      <div><dt class="text-gray-500">RTO</dt><dd class="font-medium"><%= format_price(@sale.rto) %></dd></div>
+      <div><dt class="text-gray-500">Other Charges</dt><dd class="font-medium"><%= format_price(@sale.other_charges) %></dd></div>
+      <div><dt class="text-gray-500">Total On-Road</dt><dd class="text-lg font-bold text-honda-red"><%= format_price(@sale.total_price) %></dd></div>
+      <div><dt class="text-gray-500">Booking Paid</dt><dd class="font-medium"><%= format_price(@sale.booking_amount) %></dd></div>
+    </dl>
+  </div>
+</div>
+
+<% if @sale.notes.present? %>
+  <div class="card mt-6 p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Notes</h2>
+    <p class="mt-2 text-sm text-gray-700"><%= simple_format @sale.notes %></p>
+  </div>
+<% end %>

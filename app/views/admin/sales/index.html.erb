@@ -1,0 +1,75 @@
+<% content_for :page_title, "Sales & Bookings" %>
+<% content_for :page_subtitle, "Quotations, bookings, and deliveries" %>
+
+<% current_status = params.dig(:q, :status_eq) %>
+<div class="mb-4 flex flex-wrap gap-2">
+  <%= link_to "All", admin_sales_path, class: "rounded-full px-4 py-1.5 text-sm font-medium #{current_status.blank? ? 'bg-honda-red text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
+  <% Sale.statuses.each do |key, value| %>
+    <%= link_to key.humanize.titleize, admin_sales_path(q: { status_eq: value }),
+          class: "rounded-full px-4 py-1.5 text-sm font-medium #{current_status.to_s == value.to_s ? 'bg-honda-red text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
+  <% end %>
+</div>
+
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+  <%= search_form_for @q, url: admin_sales_path, class: "flex flex-wrap items-end gap-3" do |f| %>
+    <%= f.hidden_field :status_eq if current_status.present? %>
+    <div>
+      <%= f.label :customer_name_cont, "Customer", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.search_field :customer_name_cont, class: "input-field w-44", placeholder: "Name..." %>
+    </div>
+    <div>
+      <%= f.label :bike_id_eq, "Bike", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.select :bike_id_eq, Bike.published_bikes.order(:name).map { |b| [b.name, b.id] }, { include_blank: "All" }, class: "input-field w-44" %>
+    </div>
+    <div class="flex gap-2">
+      <%= f.submit "Search", class: "btn-primary" %>
+      <%= link_to "Reset", admin_sales_path, class: "btn-secondary" %>
+      <%= render "shared/pdf_download_button", path: export_pdf_admin_sales_path(q: params[:q]) %>
+    </div>
+  <% end %>
+  <%= link_to "New Sale / Quotation", new_admin_sale_path, class: "btn-primary shrink-0" %>
+</div>
+
+<% if @sales.any? %>
+  <div class="card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Customer</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Bike</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Total Price</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Booking</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Executive</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Status</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <% @sales.each do |sale| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4">
+                <div class="text-sm font-medium text-honda-dark"><%= sale.customer_name %></div>
+                <div class="text-xs text-gray-500"><%= sale.phone %></div>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-700">
+                <%= sale.bike.name %>
+                <% if sale.bike_variant %><div class="text-xs text-gray-500"><%= sale.bike_variant.name %></div><% end %>
+              </td>
+              <td class="px-6 py-4 text-sm font-medium"><%= format_price(sale.total_price) %></td>
+              <td class="px-6 py-4 text-sm text-gray-700"><%= format_price(sale.booking_amount) %></td>
+              <td class="px-6 py-4 text-sm text-gray-600"><%= sale.sales_executive.name %></td>
+              <td class="px-6 py-4"><%= render "shared/status_badge", status: sale.status %></td>
+              <td class="px-6 py-4 text-right text-sm">
+                <%= link_to "View", admin_sale_path(sale), class: "font-semibold text-honda-red hover:text-red-700" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% if @pagy.pages > 1 %><div class="mt-6 flex justify-center"><%== pagy_nav(@pagy) %></div><% end %>
+<% else %>
+  <%= render "shared/empty_state", title: "No sales yet", message: "Create a quotation or convert an enquiry to start tracking sales.", cta_text: "New Quotation", cta_path: new_admin_sale_path %>
+<% end %>

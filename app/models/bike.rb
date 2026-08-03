@@ -12,6 +12,7 @@ class Bike < ApplicationRecord
   has_many :offers, dependent: :nullify
   has_many :test_rides, dependent: :destroy
   has_many :enquiries, dependent: :nullify
+  has_many :sales, dependent: :destroy
 
   has_many_attached :images
   has_one_attached :thumbnail

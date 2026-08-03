@@ -12,11 +12,19 @@ module Public
       @test_ride = TestRide.new(test_ride_params)
       authorize @test_ride
 
-      if @test_ride.save
-        redirect_to root_path, notice: "Your test ride request has been submitted. We will contact you shortly."
+      result = TestRides::CreateService.new(test_ride_params).call
+
+      if result[:success]
+        redirect_to root_path,
+                    flash: {
+                      notice: "Your test ride request has been submitted. We will contact you shortly.",
+                      whatsapp_customer_url: result[:whatsapp_customer_url]
+                    }
       else
+        @test_ride = result[:test_ride]
         @bikes = Bike.published_bikes.order(:name)
-        flash.now[:alert] = "Unable to submit your test ride request. Please check the form and try again."
+        flash.now[:alert] = result[:errors]&.to_sentence.presence ||
+                            "Unable to submit your test ride request. Please check the form and try again."
         render :new, status: :unprocessable_entity
       end
     end

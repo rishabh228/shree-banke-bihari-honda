@@ -13,6 +13,7 @@ class User < ApplicationRecord
 
   has_many :assigned_service_bookings, class_name: "ServiceBooking", foreign_key: :assigned_to_id, dependent: :nullify
   has_many :notifications, dependent: :destroy
+  has_many :sales, class_name: "Sale", foreign_key: :sales_executive_id, dependent: :nullify
 
   validates :name, presence: true
   validates :role, presence: true

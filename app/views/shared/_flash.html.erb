@@ -2,6 +2,7 @@
 <div id="flash-messages" class="pointer-events-none fixed inset-x-0 top-20 z-[60] flex flex-col items-center gap-3 px-4 sm:top-24" aria-live="polite">
   <% flash.each do |type, message| %>
     <% next if message.blank? %>
+    <% next if type.to_s.in?(%w[whatsapp_customer_url]) %>
 
     <% style = case type.to_s
                when "notice", "success" then { bg: "bg-emerald-600", icon: "M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }

@@ -11,6 +11,13 @@ module Admin
       @pagy, @service_bookings = pagy(@q.result.includes(:assigned_to).order(created_at: :desc))
     end
 
+    def export_pdf
+      authorize ServiceBooking, :index?
+
+      records = export_pdf_scope(ServiceBooking, includes: [ :assigned_to ])
+      send_pdf_report(Reports::Pdf::ServiceBookingsListReport, records, "service-bookings-list")
+    end
+
     def show
       authorize @service_booking
     end

@@ -28,15 +28,23 @@ module ApplicationHelper
     # Service booking
     "assigned" => "bg-violet-50 text-violet-700 ring-violet-600/20",
     "in_progress" => "bg-blue-50 text-blue-700 ring-blue-600/20",
-    "delivered" => "bg-teal-50 text-teal-700 ring-teal-600/20",
+    "delivered" => "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
     # Enquiry
     "new_enquiry" => "bg-rose-50 text-rose-700 ring-rose-600/20",
     "contacted" => "bg-sky-50 text-sky-700 ring-sky-600/20",
     "follow_up" => "bg-orange-50 text-orange-700 ring-orange-600/20",
     "closed" => "bg-gray-100 text-gray-600 ring-gray-500/20",
+    # Sale
+    "quoted" => "bg-blue-50 text-blue-700 ring-blue-600/20",
+    "booked" => "bg-violet-50 text-violet-700 ring-violet-600/20",
+    "rto_processing" => "bg-amber-50 text-amber-700 ring-amber-600/20",
     # Accessory
     "active" => "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
-    "inactive" => "bg-gray-100 text-gray-600 ring-gray-500/20"
+    "inactive" => "bg-gray-100 text-gray-600 ring-gray-500/20",
+    # Stock
+    "in_stock" => "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
+    "low_stock" => "bg-amber-50 text-amber-700 ring-amber-600/20",
+    "out_of_stock" => "bg-red-50 text-red-700 ring-red-600/20"
   }.freeze
   private_constant :STATUS_COLORS
 
@@ -51,11 +59,18 @@ module ApplicationHelper
   end
 
   def whatsapp_url(phone, message = nil)
-    return "#" if phone.blank?
+    Whatsapp::Link.build(phone, message) || "#"
+  end
 
-    digits = phone.gsub(/\D/, "")
-    digits = "91#{digits}" if digits.length == 10
-    base = "https://wa.me/#{digits}"
-    message.present? ? "#{base}?text=#{ERB::Util.url_encode(message)}" : base
+  def stock_status_badge(variant)
+    label, status_key = if !variant.available? || variant.out_of_stock?
+                          [ "Out of Stock", "out_of_stock" ]
+                        elsif variant.low_stock?
+                          [ "Low Stock (#{variant.stock_quantity})", "low_stock" ]
+                        else
+                          [ "#{variant.stock_quantity} in stock", "in_stock" ]
+                        end
+
+    render partial: "shared/status_badge", locals: { status: status_key, label: label }
   end
 end

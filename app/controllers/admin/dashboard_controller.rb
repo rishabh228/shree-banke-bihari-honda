@@ -8,6 +8,7 @@ module Admin
       @stats = Dashboard::StatsService.call
       @charts = Dashboard::ChartsService.call
       @upcoming_test_rides = TestRide.upcoming.includes(:bike).limit(10)
+      @low_stock_variants = BikeVariant.low_stock.includes(:bike).order(:stock_quantity).limit(10)
     end
   end
 end

@@ -11,6 +11,13 @@ module Admin
       @pagy, @bikes = pagy(@q.result.includes(:bike_variants).order(created_at: :desc))
     end
 
+    def export_pdf
+      authorize Bike, :index?
+
+      records = export_pdf_scope(Bike, includes: [ :bike_variants ])
+      send_pdf_report(Reports::Pdf::BikesListReport, records, "bikes-list")
+    end
+
     def show
       authorize @bike
     end
@@ -96,7 +103,7 @@ module Admin
         :thumbnail, :brochure, images: [],
         bike_variants_attributes: %i[
           id name color ex_showroom_price insurance rto handling_charge
-          accessories_charge total_price available _destroy
+          accessories_charge total_price stock_quantity available _destroy
         ],
         bike_features_attributes: %i[id title position _destroy],
         bike_specifications_attributes: %i[id label value position _destroy]

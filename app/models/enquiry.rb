@@ -3,6 +3,8 @@
 class Enquiry < ApplicationRecord
   belongs_to :bike, optional: true
 
+  has_many :sales, dependent: :nullify
+
   enum :source, {
     contact_form: 0,
     bike_enquiry: 1,

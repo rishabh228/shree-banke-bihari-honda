@@ -11,10 +11,18 @@ module Public
       @service_booking = ServiceBooking.new(service_booking_params)
       authorize @service_booking
 
-      if @service_booking.save
-        redirect_to root_path, notice: "Your service booking has been submitted. Our team will confirm your appointment soon."
+      result = ServiceBookings::CreateService.new(service_booking_params).call
+
+      if result[:success]
+        redirect_to root_path,
+                    flash: {
+                      notice: "Your service booking has been submitted. Our team will confirm your appointment soon.",
+                      whatsapp_customer_url: result[:whatsapp_customer_url]
+                    }
       else
-        flash.now[:alert] = "Unable to submit your service booking. Please check the form and try again."
+        @service_booking = result[:service_booking]
+        flash.now[:alert] = result[:errors]&.to_sentence.presence ||
+                            "Unable to submit your service booking. Please check the form and try again."
         render :new, status: :unprocessable_entity
       end
     end

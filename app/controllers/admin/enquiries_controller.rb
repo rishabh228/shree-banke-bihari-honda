@@ -11,6 +11,13 @@ module Admin
       @pagy, @enquiries = pagy(@q.result.includes(:bike).order(created_at: :desc))
     end
 
+    def export_pdf
+      authorize Enquiry, :index?
+
+      records = export_pdf_scope(Enquiry, includes: [ :bike ])
+      send_pdf_report(Reports::Pdf::EnquiriesListReport, records, "enquiries-list")
+    end
+
     def show
       authorize @enquiry
     end
@@ -34,6 +41,18 @@ module Admin
 
       @enquiry.destroy!
       redirect_to admin_enquiries_path, notice: "Enquiry was successfully deleted."
+    end
+
+    def convert_to_sale
+      authorize @enquiry, :update?
+
+      result = Sales::CreateFromEnquiryService.new(@enquiry, sales_executive: current_user).call
+
+      if result[:success]
+        redirect_to admin_sale_path(result[:sale]), notice: "Quotation created from enquiry."
+      else
+        redirect_to admin_enquiry_path(@enquiry), alert: result[:errors].join(", ")
+      end
     end
 
     private

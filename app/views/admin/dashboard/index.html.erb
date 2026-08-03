@@ -11,7 +11,13 @@
     { label: "Active Bikes", value: @stats[:active_bikes], icon: "M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12", color: "bg-amber-50 text-amber-600", link: admin_bikes_path },
     { label: "Active Offers", value: @stats[:active_offers], icon: "M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z", color: "bg-orange-50 text-orange-600", link: admin_offers_path },
     { label: "Pending Test Rides", value: @stats[:pending_test_rides], icon: "M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z", color: "bg-yellow-50 text-yellow-600", link: admin_test_rides_path(q: { status_eq: TestRide.statuses[:pending] }) },
-    { label: "Open Enquiries", value: @stats[:open_enquiries], icon: "M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75", color: "bg-indigo-50 text-indigo-600", link: admin_enquiries_path }
+    { label: "Open Enquiries", value: @stats[:open_enquiries], icon: "M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75", color: "bg-indigo-50 text-indigo-600", link: admin_enquiries_path },
+    { label: "Bikes Sold (Month)", value: @stats[:bikes_sold_this_month], icon: "M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v12.75m0 0h9.75m-9.75 0H3.375A1.125 1.125 0 012.25 15.75V4.5m15 0v12.75", color: "bg-emerald-50 text-emerald-600", link: admin_sales_path(q: { status_eq: Sale.statuses[:delivered] }) },
+    { label: "Sales Revenue (Month)", value: format_price(@stats[:sales_revenue_this_month]), icon: "M12 6v12m0 0H6m6 0h6m2 5H4a2 2 0 01-2-2V7a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2z", color: "bg-green-50 text-green-700", link: admin_sales_path },
+    { label: "Pending Sales", value: @stats[:pending_sales], icon: "M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z", color: "bg-blue-50 text-blue-600", link: admin_sales_path },
+    { label: "Bookings (Month)", value: @stats[:bookings_this_month], icon: "M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5", color: "bg-violet-50 text-violet-600", link: admin_sales_path },
+    { label: "Low Stock Variants", value: @stats[:low_stock_variants], icon: "M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z", color: "bg-amber-50 text-amber-600", link: admin_bikes_path },
+    { label: "Out of Stock", value: @stats[:out_of_stock_variants], icon: "M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636", color: "bg-red-50 text-red-600", link: admin_bikes_path }
   ] %>
   <% stat_cards.each do |card| %>
     <% card_inner = capture do %>
@@ -68,6 +74,30 @@
       <%= pie_chart @charts[:service_stats], colors: ["#CC0000", "#1A1A1A", "#C9A227", "#3B82F6", "#10B981", "#EF4444"], height: "280px" %>
     </div>
   </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Monthly Bike Sales</h2>
+    <p class="mt-1 text-sm text-gray-500">Delivered units — last 6 months</p>
+    <div class="mt-4">
+      <%= line_chart @charts[:monthly_sales], colors: ["#10B981"], height: "280px", library: { plugins: { legend: { display: false } } } %>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Sales by Bike Model</h2>
+    <p class="mt-1 text-sm text-gray-500">Delivered sales</p>
+    <div class="mt-4">
+      <%= pie_chart @charts[:sales_by_bike], colors: ["#CC0000", "#1A1A1A", "#C9A227", "#3B82F6", "#10B981"], height: "280px" %>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Sales by Executive</h2>
+    <p class="mt-1 text-sm text-gray-500">Delivered sales</p>
+    <div class="mt-4">
+      <%= bar_chart @charts[:sales_by_executive], colors: ["#CC0000"], height: "280px", library: { plugins: { legend: { display: false } } } %>
+    </div>
+  </div>
 </div>
 
 <%# Upcoming test rides %>
@@ -115,6 +145,50 @@
   <% else %>
     <div class="p-6">
       <%= render "shared/empty_state", title: "No upcoming test rides", message: "New test ride requests will appear here.", icon: "bike" %>
+    </div>
+  <% end %>
+</div>
+
+<%# Low stock alert %>
+<div class="mt-8 card">
+  <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+    <div>
+      <h2 class="font-display text-lg font-semibold text-honda-dark">Low Stock Alerts</h2>
+      <p class="text-sm text-gray-500">Variants with ≤ <%= BikeVariant::LOW_STOCK_THRESHOLD %> units remaining</p>
+    </div>
+    <%= link_to "Manage bikes", admin_bikes_path, class: "text-sm font-semibold text-honda-red hover:text-red-700" %>
+  </div>
+
+  <% if @low_stock_variants.any? %>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Bike</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Variant</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Color</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Stock</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <% @low_stock_variants.each do |variant| %>
+            <tr class="hover:bg-gray-50">
+              <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-honda-dark"><%= variant.bike.name %></td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-700"><%= variant.name %></td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500"><%= variant.color.presence || "—" %></td>
+              <td class="whitespace-nowrap px-6 py-4"><%= stock_status_badge(variant) %></td>
+              <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
+                <%= link_to "Update stock", edit_admin_bike_path(variant.bike), class: "font-semibold text-honda-red hover:text-red-700" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="p-6">
+      <%= render "shared/empty_state", title: "Stock levels healthy", message: "No variants are running low on inventory.", icon: "inbox" %>
     </div>
   <% end %>
 </div>

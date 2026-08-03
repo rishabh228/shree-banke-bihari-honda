@@ -7,6 +7,16 @@
     <span class="text-sm text-gray-500">Source: <%= @enquiry.source_label %></span>
   </div>
   <div class="flex gap-2">
+    <% if policy(Sale).create? && @enquiry.bike.present? %>
+      <%= button_to "Create Quotation", convert_to_sale_admin_enquiry_path(@enquiry), method: :post, class: "btn-primary" %>
+    <% end %>
+    <% if @enquiry.phone.present? %>
+      <%= link_to whatsapp_url(@enquiry.phone, "Hi #{@enquiry.name}, this is #{current_settings.showroom_name}. Thank you for your enquiry."),
+            target: "_blank", rel: "noopener noreferrer",
+            class: "inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1fb855]" do %>
+        Reply on WhatsApp
+      <% end %>
+    <% end %>
     <%= link_to "Edit", edit_admin_enquiry_path(@enquiry), class: "btn-secondary" %>
     <%= button_to "Delete", admin_enquiry_path(@enquiry), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "rounded-lg border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100" %>
   </div>
