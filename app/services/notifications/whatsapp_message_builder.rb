@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Notifications
-  class WhatsAppMessageBuilder
+  class WhatsappMessageBuilder
     def self.staff_message(event_type, record)
       new(event_type, record).staff_message
     end
