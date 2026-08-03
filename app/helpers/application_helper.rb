@@ -73,6 +73,10 @@ module ApplicationHelper
     ::SearchQuery::PermittedParams.call(model_class, params[:q]).to_h
   end
 
+  def contact_page_editable?
+    ContactPagePolicy.new(current_user, Setting.instance).edit?
+  end
+
   def stock_status_badge(variant)
     label, status_key = if !variant.available? || variant.out_of_stock?
                           [ "Out of Stock", "out_of_stock" ]

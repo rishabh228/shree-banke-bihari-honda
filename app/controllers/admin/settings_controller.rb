@@ -31,7 +31,8 @@ module Admin
     def setting_params
       params.require(:setting).permit(
         :showroom_name, :address, :phone, :email, :whatsapp, :whatsapp_notifications_enabled,
-        :google_map_link,
+        :google_map_link, :google_map_embed_url,
+        :contact_page_heading, :contact_page_intro, :footer_tagline,
         :facebook, :instagram, :youtube, :business_hours, :logo
       )
     end

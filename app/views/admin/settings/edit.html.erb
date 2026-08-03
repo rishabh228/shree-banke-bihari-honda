@@ -55,7 +55,11 @@
         </label>
       </div>
       <div class="md:col-span-2">
-        <%= f.label :google_map_link, "Google Maps Link", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.label :google_map_embed_url, "Google Map Embed URL", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.url_field :google_map_embed_url, class: "input-field" %>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :google_map_link, "Google Maps Directions Link", class: "mb-1 block text-sm font-medium text-gray-700" %>
         <%= f.url_field :google_map_link, class: "input-field", placeholder: "https://maps.google.com/..." %>
       </div>
       <div class="md:col-span-2">

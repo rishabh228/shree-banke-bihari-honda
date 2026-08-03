@@ -1,0 +1,106 @@
+<% content_for :page_title, "Contact Page" %>
+<% content_for :page_subtitle, "Edit public Contact Us page content" %>
+
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <p class="text-sm text-gray-500">Changes appear on the public <%= link_to "Contact Us", contact_path, target: "_blank", rel: "noopener noreferrer", class: "font-semibold text-honda-red hover:underline" %> page, site footer, and homepage contact section.</p>
+  <%= link_to "Preview Contact Page", contact_path, target: "_blank", rel: "noopener noreferrer", class: "btn-secondary text-sm" %>
+</div>
+
+<%= form_with model: @setting, url: admin_contact_page_path, method: :patch, class: "space-y-6" do |f| %>
+  <% if @setting.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-4">
+      <h3 class="text-sm font-semibold text-red-800"><%= pluralize(@setting.errors.count, "error") %> prohibited the contact page from being saved:</h3>
+      <ul class="mt-2 list-inside list-disc text-sm text-red-700">
+        <% @setting.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Page Content</h2>
+    <p class="mt-1 text-sm text-gray-500">Heading and intro text shown at the top of the Contact Us page.</p>
+    <div class="mt-6 grid grid-cols-1 gap-6">
+      <div>
+        <%= f.label :showroom_name, "Showroom / Business Name", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :showroom_name, class: "input-field", required: true %>
+      </div>
+      <div>
+        <%= f.label :contact_page_heading, "Page Heading", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :contact_page_heading, class: "input-field", placeholder: "Contact Us" %>
+      </div>
+      <div>
+        <%= f.label :contact_page_intro, "Page Introduction", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :contact_page_intro, rows: 3, class: "input-field", placeholder: "Visit our showroom, call us, or send a message..." %>
+      </div>
+      <div>
+        <%= f.label :footer_tagline, "Footer Tagline (optional)", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :footer_tagline, rows: 2, class: "input-field", placeholder: "Short description shown in the site footer." %>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Contact Details</h2>
+    <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div class="md:col-span-2">
+        <%= f.label :address, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :address, rows: 3, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :phone, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.telephone_field :phone, class: "input-field", placeholder: "+91 98765 43210" %>
+      </div>
+      <div>
+        <%= f.label :email, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.email_field :email, class: "input-field", placeholder: "info@example.com" %>
+      </div>
+      <div>
+        <%= f.label :whatsapp, "WhatsApp Number", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.telephone_field :whatsapp, class: "input-field", placeholder: "+919876543210" %>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :business_hours, "Showroom Timings", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :business_hours, rows: 4, class: "input-field", placeholder: "Mon–Sat: 9:00 AM – 7:00 PM\nSunday: 10:00 AM – 5:00 PM" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Map Links</h2>
+    <div class="mt-6 grid grid-cols-1 gap-6">
+      <div>
+        <%= f.label :google_map_embed_url, "Google Map Embed URL (for map on page)", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.url_field :google_map_embed_url, class: "input-field", placeholder: "https://maps.google.com/maps?q=...&output=embed" %>
+        <p class="mt-1 text-xs text-gray-500">Use Google Maps → Share → Embed a map → copy the iframe <code>src</code> URL.</p>
+      </div>
+      <div>
+        <%= f.label :google_map_link, "Google Maps Directions Link", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.url_field :google_map_link, class: "input-field", placeholder: "https://maps.google.com/?q=Your+Showroom" %>
+        <p class="mt-1 text-xs text-gray-500">Used for &ldquo;Open in Google Maps&rdquo; and &ldquo;Get Directions&rdquo; buttons.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Social Media Links</h2>
+    <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div>
+        <%= f.label :facebook, "Facebook URL", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.url_field :facebook, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :instagram, "Instagram URL", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.url_field :instagram, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :youtube, "YouTube URL", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.url_field :youtube, class: "input-field" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= f.submit "Save Contact Page", class: "btn-primary cursor-pointer" %>
+    <%= link_to "Cancel", admin_root_path, class: "btn-secondary" %>
+  </div>
+<% end %>

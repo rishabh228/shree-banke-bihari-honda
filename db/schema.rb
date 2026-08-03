@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_03_110000) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_03_120000) do
   create_table "accessories", force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
@@ -263,6 +263,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_03_110000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "whatsapp_notifications_enabled", default: true, null: false
+    t.string "contact_page_heading", default: "Contact Us"
+    t.text "contact_page_intro"
+    t.text "google_map_embed_url"
+    t.text "footer_tagline"
   end
 
   create_table "test_rides", force: :cascade do |t|

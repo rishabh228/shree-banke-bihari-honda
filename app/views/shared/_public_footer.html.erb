@@ -14,7 +14,7 @@
         </div>
         <h3 class="font-display text-lg font-semibold text-white"><%= current_settings.showroom_name %></h3>
         <p class="text-sm leading-relaxed text-gray-400">
-          Your trusted authorized Honda two-wheeler dealership. Explore the latest models, exclusive offers, finance options, and expert service under one roof.
+          <%= current_settings.footer_tagline.presence || "Your trusted authorized Honda two-wheeler dealership. Explore the latest models, exclusive offers, finance options, and expert service under one roof." %>
         </p>
       </div>
 

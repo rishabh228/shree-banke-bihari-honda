@@ -1,0 +1,27 @@
+<%# locals: (settings:) %>
+<% settings ||= current_settings %>
+<% if settings.social_links.any? %>
+  <div class="mt-8">
+    <h3 class="text-sm font-semibold uppercase tracking-wide text-honda-dark">Follow Us</h3>
+    <div class="mt-3 flex flex-wrap gap-3">
+      <% if settings.facebook.present? %>
+        <%= link_to settings.facebook, target: "_blank", rel: "noopener noreferrer", class: "inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-honda-red hover:text-honda-red" do %>
+          Facebook
+        <% end %>
+      <% end %>
+      <% if settings.instagram.present? %>
+        <%= link_to settings.instagram, target: "_blank", rel: "noopener noreferrer", class: "inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-honda-red hover:text-honda-red" do %>
+          Instagram
+        <% end %>
+      <% end %>
+      <% if settings.youtube.present? %>
+        <%= link_to settings.youtube, target: "_blank", rel: "noopener noreferrer", class: "inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-honda-red hover:text-honda-red" do %>
+          YouTube
+        <% end %>
+      <% end %>
+      <% if settings.whatsapp.present? %>
+        <%= link_to "WhatsApp", whatsapp_url(settings.whatsapp), target: "_blank", rel: "noopener noreferrer", class: "inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1fb855]" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

@@ -72,6 +72,7 @@ Rails.application.routes.draw do
     resources :banners
     resources :media_assets
     resource :settings, only: [ :show, :edit, :update ]
+    resource :contact_page, only: [ :edit, :update ], controller: "contact_pages"
     resources :users
     resources :notifications, only: [ :index ] do
       member do
