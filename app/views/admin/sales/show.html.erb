@@ -15,15 +15,13 @@
   </div>
 </div>
 
-<% next_statuses = Sales::StatusTransitionService::ALLOWED[@sale.status] || [] %>
-<% if next_statuses.any? %>
+<% if allowed_status_transitions(@sale).any? %>
   <div class="card mb-6 p-4">
     <p class="mb-3 text-sm font-medium text-gray-700">Update status</p>
-    <div class="flex flex-wrap gap-2">
-      <% next_statuses.each do |status| %>
-        <%= button_to status.humanize.titleize, transition_admin_sale_path(@sale, status: status), method: :patch, class: "btn-primary" %>
-      <% end %>
-    </div>
+    <%= render "shared/status_transition_buttons",
+          record: @sale,
+          inline: true,
+          button_class: "btn-primary" %>
   </div>
 <% end %>
 

@@ -1,5 +1,5 @@
 <%# Toast-style flash messages — expects flash[:notice], flash[:alert], flash[:success], flash[:error] %>
-<div id="flash-messages" class="pointer-events-none fixed inset-x-0 top-20 z-[60] flex flex-col items-center gap-3 px-4 sm:top-24" aria-live="polite">
+<div id="flash-messages" data-turbo-temporary class="pointer-events-none fixed inset-x-0 top-20 z-[60] flex flex-col items-center gap-3 px-4 sm:top-24" aria-live="polite">
   <% flash.each do |type, message| %>
     <% next if message.blank? %>
     <% next if type.to_s.in?(%w[whatsapp_customer_url]) %>
@@ -12,6 +12,7 @@
 
     <div data-controller="flash"
          data-flash-dismiss-after-value="6000"
+         data-turbo-temporary
          class="pointer-events-auto flex w-full max-w-md translate-y-0 items-start gap-3 rounded-xl <%= style[:bg] %> px-4 py-3 text-white shadow-lg ring-1 ring-black/5 transition-all duration-300"
          role="alert">
       <svg class="mt-0.5 h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">

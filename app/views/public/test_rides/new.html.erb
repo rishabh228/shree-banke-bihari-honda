@@ -11,7 +11,7 @@
 
 <div class="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
   <div class="card p-6 sm:p-8">
-    <%= form_with model: @test_ride, url: test_rides_path, local: true, html: { class: "space-y-5" } do |f| %>
+    <%= form_with model: @test_ride, url: test_rides_path, data: { turbo: false }, html: { class: "space-y-5" } do |f| %>
       <% if @test_ride.errors.any? %>
         <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3" role="alert">
           <p class="text-sm font-semibold text-red-800">Please fix the following:</p>

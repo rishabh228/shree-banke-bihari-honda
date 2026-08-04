@@ -45,10 +45,10 @@
 
     <div class="card p-6">
       <h2 class="font-display text-lg font-semibold text-honda-dark">Update Status</h2>
-      <div class="mt-4 space-y-2">
-        <% ServiceBooking.statuses.keys.reject { |s| s == @service_booking.status }.each do |status| %>
-          <%= button_to status.humanize.titleize, transition_admin_service_booking_path(@service_booking, status: status), method: :patch, class: "w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50" %>
-        <% end %>
+      <div class="mt-4">
+        <%= render "shared/status_transition_buttons",
+              record: @service_booking,
+              button_class: "w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50" %>
       </div>
     </div>
   </div>

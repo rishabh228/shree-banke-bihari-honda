@@ -77,6 +77,29 @@ module ApplicationHelper
     ContactPagePolicy.new(current_user, Setting.instance).edit?
   end
 
+  def allowed_status_transitions(record)
+    case record
+    when TestRide
+      TestRides::StatusTransitionService::ALLOWED[record.status.to_s] || []
+    when ServiceBooking
+      ServiceBookings::StatusTransitionService::ALLOWED[record.status.to_s] || []
+    when Sale
+      Sales::StatusTransitionService::ALLOWED[record.status.to_s] || []
+    else
+      []
+    end
+  end
+
+  def status_transition_path_for(record, status)
+    case record
+    when TestRide then transition_admin_test_ride_path(record, status: status)
+    when ServiceBooking then transition_admin_service_booking_path(record, status: status)
+    when Sale then transition_admin_sale_path(record, status: status)
+    else
+      raise ArgumentError, "Unsupported record for status transition: #{record.class.name}"
+    end
+  end
+
   def stock_status_badge(variant)
     label, status_key = if !variant.available? || variant.out_of_stock?
                           [ "Out of Stock", "out_of_stock" ]

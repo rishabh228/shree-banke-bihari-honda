@@ -2,7 +2,7 @@
 <% form_url ||= enquiries_path %>
 <% form_id ||= "enquiry-form-#{enquiry.source}" %>
 
-<%= form_with model: enquiry, url: form_url, local: true, html: { id: form_id, class: "space-y-5" } do |f| %>
+<%= form_with model: enquiry, url: form_url, data: { turbo: false }, html: { id: form_id, class: "space-y-5" } do |f| %>
   <%= f.hidden_field :source %>
 
   <% if enquiry.errors.any? %>

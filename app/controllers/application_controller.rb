@@ -13,6 +13,8 @@ class ApplicationController < ActionController::Base
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
+  after_action :apply_see_other_on_mutation_redirect, if: :mutation_redirect?
+
   helper_method :current_settings
 
   protected
@@ -32,7 +34,15 @@ class ApplicationController < ActionController::Base
 
   def user_not_authorized
     flash[:alert] = "You are not authorized to perform this action."
-    redirect_back(fallback_location: root_path)
+    redirect_back(fallback_location: root_path, status: :see_other)
+  end
+
+  def mutation_redirect?
+    response.redirect? && !request.get? && !request.head?
+  end
+
+  def apply_see_other_on_mutation_redirect
+    response.status = 303 if response.status == 302
   end
 
   def after_sign_in_path_for(resource)

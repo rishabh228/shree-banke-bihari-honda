@@ -14,7 +14,8 @@ export default class extends Controller {
   }
 
   dismiss() {
-    this.element.classList.add("opacity-0", "-translate-y-2")
-    setTimeout(() => this.element.remove(), 300)
+    if (this.timeout) clearTimeout(this.timeout)
+    this.element.classList.add("opacity-0", "-translate-y-2", "pointer-events-none")
+    window.setTimeout(() => this.element.remove(), 300)
   }
 }

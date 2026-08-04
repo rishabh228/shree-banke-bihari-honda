@@ -57,9 +57,9 @@ module Admin
       result = ServiceBookings::StatusTransitionService.new(@service_booking, params[:status]).call
 
       if result[:success]
-        redirect_to admin_service_booking_path(@service_booking), notice: "Service booking status updated successfully."
+        redirect_to admin_service_booking_path(@service_booking), notice: "Service booking status updated successfully.", status: :see_other
       else
-        redirect_to admin_service_booking_path(@service_booking), alert: result[:error]
+        redirect_to admin_service_booking_path(@service_booking), alert: result[:error], status: :see_other
       end
     end
 

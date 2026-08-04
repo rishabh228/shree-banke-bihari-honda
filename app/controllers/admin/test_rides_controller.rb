@@ -42,9 +42,9 @@ module Admin
       result = TestRides::StatusTransitionService.new(@test_ride, params[:status]).call
 
       if result[:success]
-        redirect_to admin_test_ride_path(@test_ride), notice: "Test ride status updated successfully."
+        redirect_to admin_test_ride_path(@test_ride), notice: "Test ride status updated successfully.", status: :see_other
       else
-        redirect_to admin_test_ride_path(@test_ride), alert: result[:error]
+        redirect_to admin_test_ride_path(@test_ride), alert: result[:error], status: :see_other
       end
     end
 

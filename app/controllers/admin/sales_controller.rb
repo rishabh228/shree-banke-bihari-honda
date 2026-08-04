@@ -62,9 +62,9 @@ module Admin
       result = Sales::StatusTransitionService.new(@sale, params[:status]).call
 
       if result[:success]
-        redirect_to admin_sale_path(@sale), notice: "Sale status updated to #{@sale.display_status}."
+        redirect_to admin_sale_path(@sale), notice: "Sale status updated to #{@sale.display_status}.", status: :see_other
       else
-        redirect_to admin_sale_path(@sale), alert: result[:error]
+        redirect_to admin_sale_path(@sale), alert: result[:error], status: :see_other
       end
     end
 

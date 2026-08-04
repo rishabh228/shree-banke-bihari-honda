@@ -32,10 +32,10 @@
   <div class="card p-6">
     <h2 class="font-display text-lg font-semibold text-honda-dark">Update Status</h2>
     <p class="mt-1 text-sm text-gray-500">Transition to a new status</p>
-    <div class="mt-4 space-y-2">
-      <% TestRide.statuses.keys.reject { |s| s == @test_ride.status }.each do |status| %>
-        <%= button_to status.humanize.titleize, transition_admin_test_ride_path(@test_ride, status: status), method: :patch, class: "w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50" %>
-      <% end %>
+    <div class="mt-4">
+      <%= render "shared/status_transition_buttons",
+            record: @test_ride,
+            button_class: "w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50" %>
     </div>
   </div>
 </div>
