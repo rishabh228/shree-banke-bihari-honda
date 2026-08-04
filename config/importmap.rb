@@ -2,6 +2,8 @@
 
 pin "application"
 pin "turbo_flash", to: "turbo_flash.js"
+pin "flash_messages", to: "flash_messages.js"
+pin "flash_auto_refresh", to: "flash_auto_refresh.js"
 pin "@hotwired/turbo-rails", to: "turbo.min.js"
 pin "@hotwired/stimulus", to: "stimulus.min.js"
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"

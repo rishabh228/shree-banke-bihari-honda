@@ -16,6 +16,7 @@ module Public
 
       if result[:success]
         redirect_to root_path,
+                    status: :see_other,
                     flash: {
                       notice: "Your test ride request has been submitted. We will contact you shortly.",
                       whatsapp_customer_url: result[:whatsapp_customer_url]

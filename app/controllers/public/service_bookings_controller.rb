@@ -15,6 +15,7 @@ module Public
 
       if result[:success]
         redirect_to root_path,
+                    status: :see_other,
                     flash: {
                       notice: "Your service booking has been submitted. Our team will confirm your appointment soon.",
                       whatsapp_customer_url: result[:whatsapp_customer_url]

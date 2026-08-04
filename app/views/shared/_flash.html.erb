@@ -1,17 +1,16 @@
-<%# Toast-style flash messages — expects flash[:notice], flash[:alert], flash[:success], flash[:error] %>
-<div id="flash-messages" data-turbo-temporary class="pointer-events-none fixed inset-x-0 top-20 z-[60] flex flex-col items-center gap-3 px-4 sm:top-24" aria-live="polite">
-  <% flash.each do |type, message| %>
-    <% next if message.blank? %>
-    <% next if type.to_s.in?(%w[whatsapp_customer_url]) %>
+<%# Toast-style flash messages %>
+<% displayable_flash = flash.reject { |type, message| message.blank? || type.to_s.in?(%w[whatsapp_customer_url]) } %>
+<% success_flash = flash[:notice].presence || flash[:success].presence %>
 
+<div id="flash-messages" data-turbo-temporary class="pointer-events-none fixed inset-x-0 top-20 z-[60] flex flex-col items-center gap-3 px-4 sm:top-24" aria-live="polite">
+  <% displayable_flash.each do |type, message| %>
     <% style = case type.to_s
                when "notice", "success" then { bg: "bg-emerald-600", icon: "M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }
                when "alert", "error" then { bg: "bg-honda-red", icon: "M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" }
                else { bg: "bg-honda-dark", icon: "M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" }
                end %>
 
-    <div data-controller="flash"
-         data-flash-dismiss-after-value="6000"
+    <div data-flash-toast
          data-turbo-temporary
          class="pointer-events-auto flex w-full max-w-md translate-y-0 items-start gap-3 rounded-xl <%= style[:bg] %> px-4 py-3 text-white shadow-lg ring-1 ring-black/5 transition-all duration-300"
          role="alert">
@@ -20,7 +19,7 @@
       </svg>
       <p class="flex-1 text-sm font-medium leading-snug"><%= message %></p>
       <button type="button"
-              data-action="flash#dismiss"
+              data-flash-dismiss
               class="-mr-1 rounded-lg p-1 text-white/80 transition hover:bg-white/10 hover:text-white"
               aria-label="Dismiss">
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -30,3 +29,40 @@
     </div>
   <% end %>
 </div>
+
+<%# Inline fallback — runs even if importmap/Stimulus fails (e.g. admin Turbo redirect) %>
+<% if displayable_flash.any? %>
+  <script data-turbo-temporary>
+    (function () {
+      function dismissToast(toast) {
+        if (!toast || toast.dataset.dismissing === "true") return;
+        toast.dataset.dismissing = "true";
+        toast.style.transition = "opacity 300ms ease, transform 300ms ease";
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-0.5rem)";
+        setTimeout(function () { toast.remove(); }, 300);
+      }
+
+      function schedule() {
+        document.querySelectorAll("[data-flash-toast]").forEach(function (toast) {
+          if (toast.dataset.dismissScheduled === "true") return;
+          toast.dataset.dismissScheduled = "true";
+          setTimeout(function () { dismissToast(toast); }, 2000);
+        });
+      }
+
+      if (!window.__flashDismissInitialized) {
+        window.__flashDismissInitialized = true;
+        document.addEventListener("click", function (event) {
+          var button = event.target.closest("[data-flash-dismiss]");
+          if (!button) return;
+          dismissToast(button.closest("[data-flash-toast]"));
+        });
+        document.addEventListener("turbo:load", schedule);
+        document.addEventListener("turbo:render", schedule);
+      }
+
+      schedule();
+    })();
+  </script>
+<% end %>

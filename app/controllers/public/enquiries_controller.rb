@@ -16,6 +16,7 @@ module Public
 
       if result[:success]
         redirect_to enquiry_success_path(result[:enquiry]),
+                    status: :see_other,
                     flash: {
                       notice: "Thank you! Your enquiry has been submitted successfully.",
                       whatsapp_customer_url: result[:whatsapp_customer_url]

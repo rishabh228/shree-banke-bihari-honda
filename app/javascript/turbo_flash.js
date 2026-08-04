@@ -1,6 +1,6 @@
-// Flash and one-time banners must not survive Turbo's back/forward cache.
+// Flash must not be saved in Turbo's back/forward cache.
 function clearSessionFlash() {
-  document.querySelectorAll("#flash-messages [data-controller~='flash']").forEach((element) => {
+  document.querySelectorAll("[data-flash-toast]").forEach((element) => {
     element.remove()
   })
 
@@ -10,4 +10,3 @@ function clearSessionFlash() {
 }
 
 document.addEventListener("turbo:before-cache", clearSessionFlash)
-document.addEventListener("turbo:before-visit", clearSessionFlash)

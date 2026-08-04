@@ -27,6 +27,13 @@
 
     <main class="flex-1">
       <%= render "shared/flash" %>
+      <% if flash[:notice].present? || flash[:success].present? %>
+        <div id="flash-auto-refresh"
+             data-flash-refresh-url="<%= request.path %>"
+             data-flash-refresh-delay="2500"
+             data-turbo-temporary
+             hidden></div>
+      <% end %>
       <%= render "shared/whatsapp_success_banner" %>
       <%= yield %>
     </main>
