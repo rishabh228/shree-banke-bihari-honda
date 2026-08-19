@@ -4,13 +4,7 @@
       <%# Column 1 — Brand %>
       <div class="space-y-4">
         <div class="flex items-center gap-3">
-          <% if current_settings.logo.attached? %>
-            <%= image_tag current_settings.logo, alt: current_settings.showroom_name, class: "h-12 w-auto brightness-0 invert" %>
-          <% else %>
-            <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-honda-red font-display text-lg font-bold text-white">
-              H
-            </div>
-          <% end %>
+          <%= showroom_logo_tag(html_class: "h-12 w-auto object-contain") %>
         </div>
         <h3 class="font-display text-lg font-semibold text-white"><%= current_settings.showroom_name %></h3>
         <p class="text-sm leading-relaxed text-gray-400">
@@ -29,6 +23,10 @@
           <li><%= link_to "Insurance", insurance_path, class: "transition hover:text-white" %></li>
           <li><%= link_to "Book Test Ride", new_test_ride_path, class: "transition hover:text-white" %></li>
           <li><%= link_to "Service Booking", new_service_booking_path, class: "transition hover:text-white" %></li>
+          <li><%= link_to "Gallery", gallery_path, class: "transition hover:text-white" %></li>
+          <% if published_cms_page("faq") %>
+            <li><%= link_to "FAQ", faq_path, class: "transition hover:text-white" %></li>
+          <% end %>
         </ul>
       </div>
 
@@ -128,6 +126,9 @@
       <div class="flex gap-6 text-sm">
         <%= link_to "Privacy Policy", privacy_path, class: "text-gray-500 transition hover:text-white" %>
         <%= link_to "Terms of Service", terms_path, class: "text-gray-500 transition hover:text-white" %>
+        <% if published_cms_page("faq") %>
+          <%= link_to "FAQ", faq_path, class: "text-gray-500 transition hover:text-white" %>
+        <% end %>
       </div>
     </div>
   </div>

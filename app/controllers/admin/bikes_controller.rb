@@ -100,6 +100,7 @@ module Admin
       params.require(:bike).permit(
         :name, :slug, :category, :engine, :mileage, :power, :torque, :fuel_tank, :weight,
         :description, :status, :seo_title, :seo_description, :meta_keywords,
+        :hsn_code, :gst_rate,
         :thumbnail, :brochure, images: [],
         bike_variants_attributes: %i[
           id name color ex_showroom_price insurance rto handling_charge

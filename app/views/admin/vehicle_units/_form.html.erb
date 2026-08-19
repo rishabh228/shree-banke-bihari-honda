@@ -1,0 +1,42 @@
+<% content_for :page_title, vehicle_unit.persisted? ? "Edit Chassis" : "Add Chassis" %>
+<% content_for :page_subtitle, "One row per vehicle in the yard" %>
+
+<%= form_with model: [ :admin, vehicle_unit ], class: "space-y-8" do |f| %>
+  <% if vehicle_unit.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      <ul class="list-disc pl-5"><% vehicle_unit.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %></ul>
+    </div>
+  <% end %>
+
+  <div class="card p-6">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="sm:col-span-2">
+        <%= f.label :bike_variant_id, "Variant", class: "mb-1 block text-sm font-medium" %>
+        <%= f.collection_select :bike_variant_id, @bike_variants, :id,
+              ->(v) { "#{v.bike.name} — #{v.name} (#{v.color})" },
+              { include_blank: "Select variant" }, class: "input-field w-full", required: true %>
+      </div>
+      <div>
+        <%= f.label :chassis_number, class: "mb-1 block text-sm font-medium" %>
+        <%= f.text_field :chassis_number, class: "input-field w-full", required: true, disabled: vehicle_unit.allotted? || vehicle_unit.delivered? %>
+      </div>
+      <div>
+        <%= f.label :engine_number, class: "mb-1 block text-sm font-medium" %>
+        <%= f.text_field :engine_number, class: "input-field w-full", required: true, disabled: vehicle_unit.allotted? || vehicle_unit.delivered? %>
+      </div>
+      <div>
+        <%= f.label :received_on, class: "mb-1 block text-sm font-medium" %>
+        <%= f.date_field :received_on, class: "input-field w-full" %>
+      </div>
+      <div class="sm:col-span-2">
+        <%= f.label :notes, class: "mb-1 block text-sm font-medium" %>
+        <%= f.text_area :notes, rows: 2, class: "input-field w-full" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex gap-3">
+    <%= f.submit vehicle_unit.persisted? ? "Update Chassis" : "Add to Stock", class: "btn-primary cursor-pointer" %>
+    <%= link_to "Cancel", vehicle_unit.persisted? ? admin_vehicle_unit_path(vehicle_unit) : admin_vehicle_units_path, class: "btn-secondary" %>
+  </div>
+<% end %>

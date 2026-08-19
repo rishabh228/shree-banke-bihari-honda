@@ -1,0 +1,38 @@
+<% content_for :page_title, @page.title %>
+<% content_for :page_subtitle, "CMS page" %>
+
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <% if @page.published? %>
+    <%= render "shared/status_badge", status: "published", label: "Published" %>
+  <% else %>
+    <%= render "shared/status_badge", status: "draft", label: "Draft" %>
+  <% end %>
+  <div class="flex flex-wrap gap-2">
+    <%= link_to "Edit", edit_admin_page_path(@page), class: "btn-secondary" %>
+    <% if @page.published? %>
+      <%= link_to "View on website", cms_page_url_for(@page), class: "btn-secondary", target: "_blank", rel: "noopener noreferrer" %>
+    <% end %>
+    <%= link_to "Back", admin_pages_path, class: "btn-secondary" %>
+    <%= button_to "Delete", admin_page_path(@page), method: :delete, data: { turbo_confirm: "Delete this page?" }, class: "rounded-lg border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100" %>
+  </div>
+</div>
+
+<div class="card p-6">
+  <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div><dt class="text-xs text-gray-500">Title</dt><dd class="text-sm font-medium text-honda-dark"><%= @page.title %></dd></div>
+    <div><dt class="text-xs text-gray-500">Slug</dt><dd class="font-mono text-sm text-gray-700"><%= @page.slug %></dd></div>
+    <div><dt class="text-xs text-gray-500">Updated</dt><dd class="text-sm font-medium"><%= @page.updated_at.strftime("%d %b %Y %H:%M") %></dd></div>
+    <div><dt class="text-xs text-gray-500">Created</dt><dd class="text-sm font-medium"><%= @page.created_at.strftime("%d %b %Y") %></dd></div>
+  </dl>
+
+  <div class="mt-6 border-t border-gray-200 pt-4">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Content</h2>
+    <% if @page.body.present? %>
+      <article class="trix-content mt-3 text-sm text-gray-700">
+        <%= @page.body %>
+      </article>
+    <% else %>
+      <p class="mt-3 text-sm text-gray-500">No content yet.</p>
+    <% end %>
+  </div>
+</div>

@@ -13,6 +13,10 @@ class NotificationPolicy < ApplicationPolicy
     staff_user?
   end
 
+  def unread_count?
+    index?
+  end
+
   class Scope < Scope
     def resolve
       scope.where(user: user)

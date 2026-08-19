@@ -19,11 +19,20 @@
         <%= f.text_field :showroom_name, class: "input-field", required: true %>
       </div>
       <div>
+        <%= f.label :legal_name, "Legal / GST name", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :legal_name, class: "input-field", placeholder: "Registered name on GSTIN" %>
+      </div>
+      <div>
+        <%= f.label :dealer_code, "Honda dealer code", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :dealer_code, class: "input-field" %>
+      </div>
+      <div>
         <%= f.label :logo, class: "mb-1 block text-sm font-medium text-gray-700" %>
         <% if @setting.logo.attached? %>
           <div class="mb-3"><%= image_tag @setting.logo, class: "h-16 w-auto rounded-lg border border-gray-200 bg-white p-2" %></div>
         <% end %>
-        <%= f.file_field :logo, accept: "image/*", class: "block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-honda-red file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-red-700" %>
+        <%= f.file_field :logo, accept: "image/png,image/jpeg,image/jpg", class: "block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-honda-red file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-red-700" %>
+        <p class="mt-2 text-xs text-gray-500">PNG or JPEG prints on tax invoices, receipts, and job cards as the Honda dealer letterhead. SVG is used on the website only.</p>
       </div>
     </div>
   </div>
@@ -65,6 +74,93 @@
       <div class="md:col-span-2">
         <%= f.label :business_hours, class: "mb-1 block text-sm font-medium text-gray-700" %>
         <%= f.text_area :business_hours, rows: 4, class: "input-field", placeholder: "Mon–Sat: 9:00 AM – 7:00 PM" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">GST & Billing</h2>
+    <p class="mt-1 text-sm text-gray-500">Required to issue tax invoices. Ex-showroom is treated as GST-inclusive.</p>
+    <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div>
+        <%= f.label :gstin, "GSTIN", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :gstin, class: "input-field", maxlength: 15, placeholder: "09AAAAA0000A1Z5" %>
+      </div>
+      <div>
+        <%= f.label :pan, "PAN", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :pan, class: "input-field", maxlength: 10, placeholder: "AAAAA0000A" %>
+      </div>
+      <div>
+        <%= f.label :state, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :state, class: "input-field", placeholder: "e.g. Uttar Pradesh" %>
+      </div>
+      <div>
+        <%= f.label :state_code, "GST state code", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :state_code, class: "input-field", maxlength: 2, placeholder: "09" %>
+      </div>
+      <div>
+        <%= f.label :invoice_prefix, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :invoice_prefix, class: "input-field", placeholder: "SBH" %>
+        <p class="mt-1 text-xs text-gray-500">Invoice numbers look like SBH/2026-27/0001.</p>
+      </div>
+      <div>
+        <%= f.label :vehicle_hsn, "Vehicle HSN", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :vehicle_hsn, class: "input-field", placeholder: "8711" %>
+      </div>
+      <div>
+        <%= f.label :vehicle_gst_rate, "Vehicle GST %", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.number_field :vehicle_gst_rate, step: 0.01, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :accessories_hsn, "Accessories HSN", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :accessories_hsn, class: "input-field", placeholder: "871410" %>
+      </div>
+      <div>
+        <%= f.label :accessories_gst_rate, "Accessories GST %", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.number_field :accessories_gst_rate, step: 0.01, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :handling_hsn, "Handling / documentation HSN", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :handling_hsn, class: "input-field", placeholder: "998599" %>
+      </div>
+      <div>
+        <%= f.label :handling_gst_rate, "Handling GST %", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.number_field :handling_gst_rate, step: 0.01, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :labour_sac, "Workshop labour SAC", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :labour_sac, class: "input-field", placeholder: "998714" %>
+      </div>
+      <div>
+        <%= f.label :labour_gst_rate, "Labour GST %", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.number_field :labour_gst_rate, step: 0.01, class: "input-field" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Bank, UPI & invoice terms</h2>
+    <p class="mt-1 text-sm text-gray-500">Printed on tax invoices and credit notes.</p>
+    <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div>
+        <%= f.label :bank_name, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :bank_name, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :bank_account_number, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :bank_account_number, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :bank_ifsc, "IFSC", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :bank_ifsc, class: "input-field" %>
+      </div>
+      <div>
+        <%= f.label :upi_id, class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :upi_id, class: "input-field" %>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :billing_terms, "Terms printed on invoice", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_area :billing_terms, rows: 4, class: "input-field" %>
       </div>
     </div>
   </div>

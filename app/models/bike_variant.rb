@@ -6,6 +6,7 @@ class BikeVariant < ApplicationRecord
   belongs_to :bike
 
   has_many :sales, dependent: :nullify
+  has_many :vehicle_units, dependent: :restrict_with_error
 
   validates :name, presence: true
   validates :stock_quantity, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
@@ -49,6 +50,13 @@ class BikeVariant < ApplicationRecord
       attrs = { stock_quantity: new_quantity }
       attrs[:available] = false if new_quantity.zero?
       update!(attrs)
+    end
+  end
+
+  def increment_stock!(quantity = 1)
+    with_lock do
+      new_quantity = stock_quantity + quantity
+      update!(stock_quantity: new_quantity, available: true)
     end
   end
 end

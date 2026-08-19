@@ -4,4 +4,8 @@ class ReportPolicy < ApplicationPolicy
   def index?
     admin_user?
   end
+
+  def tally_export?
+    index?
+  end
 end

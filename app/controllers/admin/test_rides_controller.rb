@@ -2,7 +2,7 @@
 
 module Admin
   class TestRidesController < BaseController
-    before_action :set_test_ride, only: %i[show edit update destroy transition]
+    before_action :set_test_ride, only: %i[show edit update destroy transition convert_to_enquiry convert_to_sale]
 
     def index
       authorize TestRide
@@ -45,6 +45,28 @@ module Admin
         redirect_to admin_test_ride_path(@test_ride), notice: "Test ride status updated successfully.", status: :see_other
       else
         redirect_to admin_test_ride_path(@test_ride), alert: result[:error], status: :see_other
+      end
+    end
+
+    def convert_to_enquiry
+      authorize @test_ride, :convert_to_enquiry?
+
+      result = TestRides::CreateEnquiryService.new(@test_ride).call
+      if result[:success]
+        redirect_to admin_enquiry_path(result[:enquiry]), notice: "Enquiry created from this test ride."
+      else
+        redirect_to admin_test_ride_path(@test_ride), alert: result[:errors].join(", ")
+      end
+    end
+
+    def convert_to_sale
+      authorize @test_ride, :convert_to_sale?
+
+      result = TestRides::CreateSaleService.new(@test_ride, sales_executive: current_user).call
+      if result[:success]
+        redirect_to admin_sale_path(result[:sale]), notice: "Quotation created from this test ride."
+      else
+        redirect_to admin_test_ride_path(@test_ride), alert: Array(result[:errors]).join(", ")
       end
     end
 

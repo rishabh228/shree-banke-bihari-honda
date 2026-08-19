@@ -1,0 +1,170 @@
+<% content_for :page_title, @counter_invoice.invoice_number.presence || "Draft spare bill" %>
+<% content_for :page_subtitle, @counter_invoice.customer_name %>
+
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <div class="flex flex-wrap items-center gap-3">
+    <%= render "shared/status_badge", status: @counter_invoice.status %>
+    <span class="text-sm text-gray-500"><%= @counter_invoice.display_kind %></span>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <% if @counter_invoice.issued? %>
+      <%= link_to "Original", invoice_pdf_admin_counter_invoice_path(@counter_invoice, copy: "original"), class: "btn-primary", data: { turbo: false } %>
+      <%= link_to "Duplicate", invoice_pdf_admin_counter_invoice_path(@counter_invoice, copy: "duplicate"), class: "btn-secondary", data: { turbo: false } %>
+      <%= link_to "Triplicate", invoice_pdf_admin_counter_invoice_path(@counter_invoice, copy: "triplicate"), class: "btn-secondary", data: { turbo: false } %>
+    <% end %>
+    <% if @counter_invoice.credit_noted? %>
+      <%= link_to "Latest credit note PDF", credit_note_pdf_admin_counter_invoice_path(@counter_invoice), class: "btn-secondary", data: { turbo: false } %>
+    <% end %>
+    <% if @counter_invoice.draft? && policy(@counter_invoice).issue? %>
+      <%= button_to "Issue tax invoice", issue_admin_counter_invoice_path(@counter_invoice), method: :post, class: "btn-primary" %>
+    <% end %>
+    <% if @counter_invoice.draft? %>
+      <%= link_to "Edit", edit_admin_counter_invoice_path(@counter_invoice), class: "btn-secondary" %>
+    <% end %>
+    <%= link_to "All bills", admin_counter_invoices_path, class: "btn-secondary" %>
+    <% if @counter_invoice.draft? && policy(@counter_invoice).destroy? %>
+      <%= button_to "Delete draft", admin_counter_invoice_path(@counter_invoice), method: :delete, data: { turbo_confirm: "Delete this draft?" }, class: "rounded-lg border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Customer</h2>
+    <dl class="mt-4 space-y-3 text-sm">
+      <div><dt class="text-gray-500">Name</dt><dd class="font-medium"><%= @counter_invoice.customer_name %></dd></div>
+      <div><dt class="text-gray-500">Phone</dt><dd class="font-medium"><%= @counter_invoice.phone.presence || "—" %></dd></div>
+      <div><dt class="text-gray-500">GSTIN / PAN</dt><dd class="font-medium"><%= [ @counter_invoice.buyer_gstin, @counter_invoice.buyer_pan ].compact_blank.join(" / ").presence || "—" %></dd></div>
+      <div><dt class="text-gray-500">Place of supply</dt><dd class="font-medium"><%= [ @counter_invoice.place_of_supply, @counter_invoice.place_of_supply_code ].compact_blank.join(" / ") %></dd></div>
+    </dl>
+  </div>
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Totals</h2>
+    <dl class="mt-4 space-y-3 text-sm">
+      <div><dt class="text-gray-500">Taxable</dt><dd class="font-medium"><%= format_amount(@counter_invoice.taxable_total) %></dd></div>
+      <div><dt class="text-gray-500">GST</dt><dd class="font-medium"><%= format_amount(@counter_invoice.tax_total) %></dd></div>
+      <div><dt class="text-gray-500">Discount</dt><dd class="font-medium"><%= format_amount(@counter_invoice.preview_discount) %></dd></div>
+      <div><dt class="text-gray-500">Grand total</dt><dd class="text-lg font-bold text-honda-red"><%= format_amount(@counter_invoice.draft? ? @counter_invoice.preview_grand_total : @counter_invoice.grand_total) %></dd></div>
+      <% if @counter_invoice.issued? || @counter_invoice.cancelled? %>
+        <div><dt class="text-gray-500">Credited</dt><dd class="font-medium"><%= format_amount(@counter_invoice.credited_total) %></dd></div>
+        <div><dt class="text-gray-500">Remaining</dt><dd class="font-medium"><%= format_amount(@counter_invoice.remaining_value) %></dd></div>
+      <% end %>
+      <div><dt class="text-gray-500">IRN</dt><dd class="font-medium break-all"><%= @counter_invoice.irn.presence || (@counter_invoice.einvoice_applicable? ? "Pending" : "Not applicable") %></dd></div>
+    </dl>
+  </div>
+</div>
+
+<div class="mt-6 card p-6">
+  <h2 class="font-display mb-4 text-lg font-semibold text-honda-dark">Lines</h2>
+  <% if @counter_invoice.lines.any? %>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-3 py-2 text-left text-xs font-semibold uppercase text-gray-500">Description</th>
+            <th class="px-3 py-2 text-left text-xs font-semibold uppercase text-gray-500">HSN</th>
+            <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500">Qty</th>
+            <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500">Left</th>
+            <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500">Amount</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <% @counter_invoice.lines.each do |line| %>
+            <tr>
+              <td class="px-3 py-2 font-medium"><%= line.description %></td>
+              <td class="px-3 py-2 text-gray-600"><%= line.hsn_code %></td>
+              <td class="px-3 py-2 text-right"><%= line.quantity %> <%= line.uqc %></td>
+              <td class="px-3 py-2 text-right text-gray-600"><%= line.remaining_quantity %></td>
+              <td class="px-3 py-2 text-right font-medium"><%= format_amount(line.inclusive_amount) %></td>
+              <td class="px-3 py-2 text-right">
+                <% if @counter_invoice.draft? %>
+                  <%= button_to "Remove", admin_counter_invoice_line_path(@counter_invoice, line), method: :delete, class: "text-xs text-red-600" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="mb-4 text-sm text-gray-500">No lines yet.</p>
+  <% end %>
+
+  <% if @counter_invoice.draft? %>
+    <%= form_with model: @line, url: admin_counter_invoice_lines_path(@counter_invoice), class: "mt-4 grid grid-cols-1 gap-3 border-t border-gray-100 pt-4 sm:grid-cols-6" do |f| %>
+      <div class="sm:col-span-2">
+        <%= f.label :accessory_id, "From stock", class: "mb-1 block text-xs text-gray-500" %>
+        <%= f.collection_select :accessory_id, @accessories, :id, :name, { include_blank: "Custom part" }, class: "input-field w-full" %>
+      </div>
+      <div class="sm:col-span-2">
+        <%= f.label :description, class: "mb-1 block text-xs text-gray-500" %>
+        <%= f.text_field :description, class: "input-field w-full" %>
+      </div>
+      <div>
+        <%= f.label :quantity, class: "mb-1 block text-xs text-gray-500" %>
+        <%= f.number_field :quantity, min: 0.01, step: 0.01, class: "input-field w-full" %>
+      </div>
+      <div>
+        <%= f.label :unit_price, "Unit (incl. GST)", class: "mb-1 block text-xs text-gray-500" %>
+        <%= f.number_field :unit_price, step: 0.01, min: 0, class: "input-field w-full" %>
+      </div>
+      <div class="sm:col-span-6"><%= f.submit "Add line", class: "btn-primary cursor-pointer" %></div>
+    <% end %>
+  <% end %>
+</div>
+
+<% if @counter_invoice.issued? && policy(@counter_invoice).capture_irn? %>
+  <div class="mt-6 card p-6">
+    <%= form_with url: capture_irn_admin_counter_invoice_path(@counter_invoice), method: :patch, class: "space-y-3" do %>
+      <p class="text-sm font-medium text-gray-700">Record IRN from GSP / Honda HiRise</p>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <%= text_field_tag :irn, @counter_invoice.irn, required: true, placeholder: "IRN", class: "input-field w-full sm:col-span-3" %>
+        <%= text_field_tag :ack_no, @counter_invoice.ack_no, placeholder: "Ack no.", class: "input-field w-full" %>
+        <%= date_field_tag :ack_date, @counter_invoice.ack_date, class: "input-field w-full" %>
+      </div>
+      <%= submit_tag "Save IRN", class: "btn-secondary cursor-pointer" %>
+    <% end %>
+  </div>
+<% end %>
+
+<% if @counter_invoice.issued? && policy(@counter_invoice).cancel_invoice? %>
+  <div class="mt-6 card p-6">
+    <%= form_with url: cancel_invoice_admin_counter_invoice_path(@counter_invoice), method: :post, class: "space-y-3" do %>
+      <p class="text-sm font-medium text-gray-700">Issue credit note</p>
+      <p class="text-xs text-gray-500">Return quantities restore spare stock. Reversing the remainder cancels this bill. Workshop job cards return to open only on a full remaining reversal.</p>
+      <%= text_field_tag :reason, nil, required: true, placeholder: "Reason (return / cancellation / correction)", class: "input-field w-full" %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-3 py-2 text-left text-xs font-semibold uppercase text-gray-500">Item</th>
+              <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500">Left</th>
+              <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500">Return qty</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <% @counter_invoice.lines.each do |line| %>
+              <tr>
+                <td class="px-3 py-2 font-medium"><%= line.description %></td>
+                <td class="px-3 py-2 text-right"><%= line.remaining_quantity %></td>
+                <td class="px-3 py-2 text-right">
+                  <%= number_field_tag "line_returns[#{line.id}]", nil, min: 0, max: line.remaining_quantity, step: 0.01, class: "input-field ml-auto w-24", disabled: line.remaining_quantity <= 0 %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <%= submit_tag "Issue partial credit note", class: "btn-secondary cursor-pointer" %>
+        <%= submit_tag "Reverse remaining in full", name: "full", value: "1", class: "rounded-lg border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100 cursor-pointer", data: { turbo_confirm: "Issue a credit note for the remaining value and cancel this invoice?" } %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+<% if @counter_invoice.credit_notes.any? %>
+  <div class="mt-6 card p-6">
+    <%= render "admin/shared/credit_notes", notes: @counter_invoice.credit_notes.order(created_at: :desc), pdf_path: ->(note) { credit_note_pdf_admin_counter_invoice_path(@counter_invoice, credit_note_id: note.id) }, bordered: false %>
+  </div>
+<% end %>

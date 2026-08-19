@@ -1,0 +1,37 @@
+<% content_for :page_title, @vehicle_unit.chassis_number %>
+<% content_for :page_subtitle, @vehicle_unit.bike_variant.bike.name %>
+
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <%= render "shared/status_badge", status: @vehicle_unit.status %>
+  <div class="flex flex-wrap gap-2">
+    <% if @vehicle_unit.in_stock? %>
+      <%= link_to "Edit", edit_admin_vehicle_unit_path(@vehicle_unit), class: "btn-secondary" %>
+    <% end %>
+    <% if policy(@vehicle_unit).destroy? && @vehicle_unit.in_stock? %>
+      <%= button_to "Delete", admin_vehicle_unit_path(@vehicle_unit), method: :delete, data: { turbo_confirm: "Delete this chassis unit?" }, class: "rounded-lg border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="card p-6">
+  <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2 text-sm">
+    <div><dt class="text-gray-500">Chassis</dt><dd class="font-medium"><%= @vehicle_unit.chassis_number %></dd></div>
+    <div><dt class="text-gray-500">Engine</dt><dd class="font-medium"><%= @vehicle_unit.engine_number %></dd></div>
+    <div><dt class="text-gray-500">Bike</dt><dd class="font-medium"><%= @vehicle_unit.bike_variant.bike.name %></dd></div>
+    <div><dt class="text-gray-500">Variant</dt><dd class="font-medium"><%= [ @vehicle_unit.bike_variant.name, @vehicle_unit.bike_variant.color ].compact.join(" · ") %></dd></div>
+    <div><dt class="text-gray-500">Received</dt><dd class="font-medium"><%= @vehicle_unit.received_on&.strftime("%d %b %Y") || "—" %></dd></div>
+    <div>
+      <dt class="text-gray-500">Allotted to</dt>
+      <dd class="font-medium">
+        <% if @vehicle_unit.sale %>
+          <%= link_to @vehicle_unit.sale.customer_name, admin_sale_path(@vehicle_unit.sale), class: "text-honda-red font-semibold" %>
+        <% else %>
+          —
+        <% end %>
+      </dd>
+    </div>
+  </dl>
+  <% if @vehicle_unit.notes.present? %>
+    <p class="mt-6 text-sm text-gray-700"><%= simple_format @vehicle_unit.notes %></p>
+  <% end %>
+</div>

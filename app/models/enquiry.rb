@@ -11,7 +11,8 @@ class Enquiry < ApplicationRecord
     finance: 2,
     insurance: 3,
     accessories: 4,
-    general: 5
+    general: 5,
+    test_ride: 6
   }, default: :general
 
   enum :status, {

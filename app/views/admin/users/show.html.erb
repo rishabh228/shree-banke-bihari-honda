@@ -1,0 +1,31 @@
+<% content_for :page_title, @user.name %>
+<% content_for :page_subtitle, "Staff account" %>
+
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <%= render "shared/status_badge", status: "active", label: @user.display_role %>
+  <div class="flex flex-wrap gap-2">
+    <%= link_to "Edit", edit_admin_user_path(@user), class: "btn-secondary" %>
+    <%= link_to "Back", admin_users_path, class: "btn-secondary" %>
+    <% if @user != current_user %>
+      <%= button_to "Delete", admin_user_path(@user), method: :delete, data: { turbo_confirm: "Delete this user?" }, class: "rounded-lg border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="card p-6">
+  <div class="flex items-center gap-4">
+    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-honda-red text-lg font-bold text-white">
+      <%= @user.name.to_s.first.upcase %>
+    </div>
+    <div>
+      <h2 class="font-display text-xl font-semibold text-honda-dark"><%= @user.name %></h2>
+      <p class="text-sm text-gray-500"><%= @user.display_role %></p>
+    </div>
+  </div>
+
+  <dl class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div><dt class="text-xs text-gray-500">Email</dt><dd class="text-sm font-medium"><%= @user.email %></dd></div>
+    <div><dt class="text-xs text-gray-500">Role</dt><dd class="text-sm font-medium"><%= @user.display_role %></dd></div>
+    <div><dt class="text-xs text-gray-500">Created</dt><dd class="text-sm font-medium"><%= @user.created_at.strftime("%d %b %Y") %></dd></div>
+  </dl>
+</div>

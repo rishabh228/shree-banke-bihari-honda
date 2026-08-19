@@ -1,5 +1,204 @@
 <% content_for :page_title, "Reports" %>
-<% content_for :page_subtitle, "Analytics and business insights" %>
+<% content_for :page_subtitle, "GST register, outstanding dues, and showroom analytics" %>
+
+<div class="mb-8 card p-6">
+  <h2 class="font-display text-lg font-semibold text-honda-dark">Date range</h2>
+  <%= form_with url: admin_reports_path, method: :get, class: "mt-4 flex flex-wrap items-end gap-3" do %>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-gray-500">From</label>
+      <%= date_field_tag :from, @from, class: "input-field" %>
+    </div>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-gray-500">To</label>
+      <%= date_field_tag :to, @to, class: "input-field" %>
+    </div>
+    <%= submit_tag "Apply", class: "btn-secondary cursor-pointer" %>
+  <% end %>
+</div>
+
+<div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+  <div class="card p-5">
+    <p class="text-sm font-medium text-gray-500">Taxable (net of CNs)</p>
+    <p class="mt-2 font-display text-2xl font-bold text-honda-dark"><%= format_amount(@register.gst_taxable) %></p>
+  </div>
+  <div class="card p-5">
+    <p class="text-sm font-medium text-gray-500">GST (net of CNs)</p>
+    <p class="mt-2 font-display text-2xl font-bold text-honda-dark"><%= format_amount(@register.gst_tax) %></p>
+  </div>
+  <div class="card p-5">
+    <p class="text-sm font-medium text-gray-500">Invoice value (net)</p>
+    <p class="mt-2 font-display text-2xl font-bold text-honda-red"><%= format_amount(@register.gst_invoice_value) %></p>
+  </div>
+</div>
+
+<div class="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-3">
+  <div class="card p-5">
+    <p class="text-sm font-medium text-gray-500">Sales revenue (month)</p>
+    <p class="mt-2 font-display text-2xl font-bold text-honda-dark"><%= format_price(@stats[:sales_revenue_this_month]) %></p>
+  </div>
+  <div class="card p-5">
+    <p class="text-sm font-medium text-gray-500">Bikes sold (month)</p>
+    <p class="mt-2 font-display text-2xl font-bold text-honda-dark"><%= @stats[:bikes_sold_this_month] %></p>
+  </div>
+  <div class="card p-5">
+    <p class="text-sm font-medium text-gray-500">Pipeline sales</p>
+    <p class="mt-2 font-display text-2xl font-bold text-honda-dark"><%= @stats[:pending_sales] %></p>
+  </div>
+</div>
+
+<div class="mb-8 card overflow-hidden">
+  <div class="border-b border-gray-100 px-6 py-4">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">GST sales register</h2>
+    <p class="text-sm text-gray-500">Issued vehicle and spare/workshop invoices in range.</p>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200 text-sm">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-500">Date</th>
+          <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-500">No.</th>
+          <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-500">Party</th>
+          <th class="px-4 py-2 text-right text-xs font-semibold uppercase text-gray-500">Taxable</th>
+          <th class="px-4 py-2 text-right text-xs font-semibold uppercase text-gray-500">GST</th>
+          <th class="px-4 py-2 text-right text-xs font-semibold uppercase text-gray-500">Value</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <% (@register.vehicle_invoices.to_a + @register.counter_invoices.to_a).sort_by { |inv| [ inv.invoice_date, inv.id ] }.each do |inv| %>
+          <tr>
+            <td class="px-4 py-2"><%= inv.invoice_date.strftime("%d %b %Y") %></td>
+            <td class="px-4 py-2 font-medium">
+              <% if inv.is_a?(Invoice) %>
+                <%= link_to inv.invoice_number, admin_sale_path(inv.sale), class: "text-honda-red hover:underline" %>
+              <% else %>
+                <%= link_to inv.invoice_number, admin_counter_invoice_path(inv), class: "text-honda-red hover:underline" %>
+              <% end %>
+            </td>
+            <td class="px-4 py-2"><%= inv.is_a?(Invoice) ? inv.sale.customer_name : inv.customer_name %></td>
+            <td class="px-4 py-2 text-right"><%= format_amount(inv.taxable_total) %></td>
+            <td class="px-4 py-2 text-right"><%= format_amount(inv.tax_total) %></td>
+            <td class="px-4 py-2 text-right font-medium"><%= format_amount(inv.grand_total) %></td>
+          </tr>
+        <% end %>
+        <% if @register.vehicle_invoices.none? && @register.counter_invoices.none? %>
+          <tr><td colspan="6" class="px-4 py-6 text-center text-gray-500">No invoices in this range.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+  <div class="card overflow-hidden">
+    <div class="border-b border-gray-100 px-6 py-4">
+      <h2 class="font-display text-lg font-semibold text-honda-dark">Credit notes</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-500">Date</th>
+            <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-500">CN</th>
+            <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-500">Kind</th>
+            <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-500">Against</th>
+            <th class="px-4 py-2 text-right text-xs font-semibold uppercase text-gray-500">Amount</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <% @register.credit_notes.each do |note| %>
+            <tr>
+              <td class="px-4 py-2"><%= note.credit_note_date.strftime("%d %b %Y") %></td>
+              <td class="px-4 py-2 font-medium"><%= note.credit_note_number %></td>
+              <td class="px-4 py-2"><%= note.display_kind %></td>
+              <td class="px-4 py-2"><%= note.against_number %></td>
+              <td class="px-4 py-2 text-right"><%= format_amount(note.grand_total) %></td>
+            </tr>
+          <% end %>
+          <% if @register.credit_notes.none? %>
+            <tr><td colspan="5" class="px-4 py-6 text-center text-gray-500">No credit notes.</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card overflow-hidden">
+    <div class="border-b border-gray-100 px-6 py-4">
+      <h2 class="font-display text-lg font-semibold text-honda-dark">Outstanding dues</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-500">Customer</th>
+            <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-500">Status</th>
+            <th class="px-4 py-2 text-right text-xs font-semibold uppercase text-gray-500">Due</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <% @register.outstanding_sales.first(15).each do |sale| %>
+            <tr>
+              <td class="px-4 py-2"><%= link_to sale.customer_name, admin_sale_path(sale), class: "font-medium text-honda-red hover:underline" %></td>
+              <td class="px-4 py-2"><%= sale.display_status %></td>
+              <td class="px-4 py-2 text-right font-medium"><%= format_amount(sale.outstanding_amount) %></td>
+            </tr>
+          <% end %>
+          <% if @register.outstanding_sales.none? %>
+            <tr><td colspan="3" class="px-4 py-6 text-center text-gray-500">No outstanding balances.</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="mb-8 card overflow-hidden">
+  <div class="border-b border-gray-100 px-6 py-4">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Receipts register</h2>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200 text-sm">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-500">Date</th>
+          <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-500">Receipt</th>
+          <th class="px-4 py-2 text-left text-xs font-semibold uppercase text-gray-500">Customer</th>
+          <th class="px-4 py-2 text-right text-xs font-semibold uppercase text-gray-500">Amount</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <% @register.receipts.each do |receipt| %>
+          <tr>
+            <td class="px-4 py-2"><%= receipt.received_on.strftime("%d %b %Y") %></td>
+            <td class="px-4 py-2 font-medium"><%= receipt.receipt_number %></td>
+            <td class="px-4 py-2"><%= link_to receipt.sale.customer_name, admin_sale_path(receipt.sale), class: "text-honda-red hover:underline" %></td>
+            <td class="px-4 py-2 text-right"><%= format_amount(receipt.amount) %></td>
+          </tr>
+        <% end %>
+        <% if @register.receipts.none? %>
+          <tr><td colspan="4" class="px-4 py-6 text-center text-gray-500">No receipts in this range.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="mb-8 card p-6">
+  <h2 class="font-display text-lg font-semibold text-honda-dark">Tally voucher export</h2>
+  <p class="mt-1 text-sm text-gray-500">Download issued vehicle invoices, spare/workshop invoices, credit notes, and receipts. CSV is for Excel. XML imports into TallyPrime (Import Data → Vouchers). Map ledgers Sales, CGST, SGST, IGST, Cash/UPI/Bank on first import. e-Invoice IRN is included when captured from HiRise / GSP.</p>
+  <%= form_with url: admin_reports_tally_export_path, method: :get, data: { turbo: false }, class: "mt-4 flex flex-wrap items-end gap-3" do %>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-gray-500">From</label>
+      <%= date_field_tag :from, @from, class: "input-field" %>
+    </div>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-gray-500">To</label>
+      <%= date_field_tag :to, @to, class: "input-field" %>
+    </div>
+    <%= button_tag "Download CSV", type: "submit", name: "kind", value: "csv", class: "btn-primary cursor-pointer" %>
+    <%= button_tag "Download Tally XML", type: "submit", name: "kind", value: "xml", class: "btn-secondary cursor-pointer" %>
+  <% end %>
+</div>
 
 <%# Summary stats %>
 <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

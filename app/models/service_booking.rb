@@ -18,6 +18,9 @@ class ServiceBooking < ApplicationRecord
   validates :service_type, inclusion: { in: SERVICE_TYPES }
   validates :phone, format: { with: /\A[0-9+\-\s]{10,15}\z/, message: "must be valid" }
 
+  has_one :job_card, dependent: :destroy
+  has_one :workshop_invoice, through: :job_card, source: :counter_invoice
+
   scope :upcoming, -> { where(preferred_date: Date.current..).where.not(status: :cancelled).order(:preferred_date) }
   scope :today, -> { where(preferred_date: Date.current) }
   scope :recent, -> { order(created_at: :desc) }

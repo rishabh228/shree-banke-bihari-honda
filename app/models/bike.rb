@@ -13,6 +13,7 @@ class Bike < ApplicationRecord
   has_many :test_rides, dependent: :destroy
   has_many :enquiries, dependent: :nullify
   has_many :sales, dependent: :destroy
+  has_many :vehicle_units, through: :bike_variants
 
   has_many_attached :images
   has_one_attached :thumbnail
@@ -25,13 +26,14 @@ class Bike < ApplicationRecord
   validates :name, presence: true, uniqueness: true
   validates :slug, presence: true, uniqueness: true
   validates :status, presence: true
+  validates :gst_rate, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }, allow_nil: true
 
   scope :published_bikes, -> { where(status: :published) }
   scope :featured, -> { published_bikes.order(created_at: :desc).limit(6) }
   scope :by_category, ->(category) { where(category: category) if category.present? }
 
   def self.ransackable_attributes(_auth_object = nil)
-    %w[category name engine mileage power status slug]
+    %w[category name engine mileage power status slug hsn_code]
   end
 
   def self.ransackable_associations(_auth_object = nil)
@@ -39,6 +41,14 @@ class Bike < ApplicationRecord
   end
 
   before_validation :set_published_at, if: -> { published? && published_at.blank? }
+
+  def hsn
+    hsn_code.presence || Setting.instance.vehicle_hsn_code
+  end
+
+  def tax_rate
+    (gst_rate.presence || Setting.instance.vehicle_tax_rate).to_d
+  end
 
   def starting_price
     bike_variants.available_variants.minimum(:total_price) || bike_variants.minimum(:total_price)

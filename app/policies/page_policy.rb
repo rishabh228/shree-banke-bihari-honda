@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class PagePolicy < ApplicationPolicy
-  def index? = super_admin?
-  def show? = super_admin?
-  def create? = super_admin?
-  def update? = super_admin?
+  def index? = super_admin? || manager?
+  def show? = super_admin? || manager?
+  def create? = super_admin? || manager?
+  def update? = super_admin? || manager?
   def destroy? = super_admin?
 
   class Scope < Scope

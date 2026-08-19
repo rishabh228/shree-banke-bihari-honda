@@ -1,7 +1,7 @@
 <% content_for :page_title, "Service Bookings" %>
 <% content_for :page_subtitle, "Manage service appointments" %>
 
-<div class="mb-6">
+<div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
   <%= search_form_for @q, url: admin_service_bookings_path, class: "flex flex-wrap items-end gap-3" do |f| %>
     <div>
       <%= f.label :customer_name_cont, "Customer", class: "mb-1 block text-xs font-medium text-gray-500" %>
@@ -24,6 +24,9 @@
       <%= link_to "Reset", admin_service_bookings_path, class: "btn-secondary" %>
       <%= render "shared/pdf_download_button", path: export_pdf_admin_service_bookings_path(q: export_ransack_params_for(ServiceBooking)) %>
     </div>
+  <% end %>
+  <% if policy(ServiceBooking).admin_create? %>
+    <%= link_to "New walk-in booking", new_admin_service_booking_path, class: "btn-primary shrink-0" %>
   <% end %>
 </div>
 
@@ -69,5 +72,9 @@
   </div>
   <% if @pagy.pages > 1 %><div class="mt-6 flex justify-center"><%== pagy_nav(@pagy) %></div><% end %>
 <% else %>
-  <%= render "shared/empty_state", title: "No service bookings", message: "Customer service requests will appear here." %>
+  <%= render "shared/empty_state",
+        title: "No service bookings",
+        message: "Website requests appear here. Add a walk-in or phone booking from the button above.",
+        cta_text: (policy(ServiceBooking).admin_create? ? "New walk-in booking" : nil),
+        cta_path: (policy(ServiceBooking).admin_create? ? new_admin_service_booking_path : nil) %>
 <% end %>

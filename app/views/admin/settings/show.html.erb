@@ -13,6 +13,8 @@
     <h2 class="font-display text-lg font-semibold text-honda-dark">Branding</h2>
     <dl class="mt-4 space-y-3">
       <div><dt class="text-xs text-gray-500">Showroom Name</dt><dd class="text-sm font-medium"><%= @setting.showroom_name %></dd></div>
+      <div><dt class="text-xs text-gray-500">Legal / GST name</dt><dd class="text-sm font-medium"><%= @setting.legal_showroom_name %></dd></div>
+      <div><dt class="text-xs text-gray-500">Dealer code</dt><dd class="text-sm font-medium"><%= @setting.dealer_code.presence || "—" %></dd></div>
       <% if @setting.logo.attached? %>
         <div><dt class="text-xs text-gray-500">Logo</dt><dd class="mt-2"><%= image_tag @setting.logo, class: "h-16 w-auto rounded-lg border border-gray-200 bg-white p-2" %></dd></div>
       <% end %>
@@ -28,6 +30,21 @@
       <div><dt class="text-xs text-gray-500">WhatsApp</dt><dd class="text-sm font-medium"><%= @setting.whatsapp.presence || "—" %></dd></div>
       <div><dt class="text-xs text-gray-500">WhatsApp Staff Alerts</dt><dd class="text-sm font-medium"><%= @setting.whatsapp_notifications_enabled? ? "Enabled" : "Disabled" %></dd></div>
       <div><dt class="text-xs text-gray-500">Business Hours</dt><dd class="text-sm"><%= simple_format(@setting.business_hours.presence || "—") %></dd></div>
+    </dl>
+  </div>
+
+  <div class="card p-6 lg:col-span-2">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">GST & Billing</h2>
+    <dl class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div><dt class="text-xs text-gray-500">GSTIN</dt><dd class="text-sm font-medium"><%= @setting.gstin.presence || "—" %></dd></div>
+      <div><dt class="text-xs text-gray-500">PAN</dt><dd class="text-sm font-medium"><%= @setting.pan.presence || "—" %></dd></div>
+      <div><dt class="text-xs text-gray-500">State / code</dt><dd class="text-sm font-medium"><%= [ @setting.state, @setting.state_code ].compact_blank.join(" / ").presence || "—" %></dd></div>
+      <div><dt class="text-xs text-gray-500">Invoice prefix</dt><dd class="text-sm font-medium"><%= @setting.invoice_prefix_code %></dd></div>
+      <div><dt class="text-xs text-gray-500">Vehicle HSN / GST</dt><dd class="text-sm font-medium"><%= @setting.vehicle_hsn_code %> · <%= @setting.vehicle_tax_rate.to_f %>%</dd></div>
+      <div><dt class="text-xs text-gray-500">Accessories HSN / GST</dt><dd class="text-sm font-medium"><%= @setting.accessories_hsn_code %> · <%= @setting.accessories_tax_rate.to_f %>%</dd></div>
+      <div><dt class="text-xs text-gray-500">Handling HSN / GST</dt><dd class="text-sm font-medium"><%= @setting.handling_hsn_code %> · <%= @setting.handling_tax_rate.to_f %>%</dd></div>
+      <div><dt class="text-xs text-gray-500">Labour SAC / GST</dt><dd class="text-sm font-medium"><%= @setting.labour_sac_code %> · <%= @setting.labour_tax_rate.to_f %>%</dd></div>
+      <div><dt class="text-xs text-gray-500">Bank / UPI</dt><dd class="text-sm font-medium"><%= [ @setting.bank_name, @setting.bank_account_number, @setting.bank_ifsc, @setting.upi_id ].compact_blank.join(" · ").presence || "—" %></dd></div>
     </dl>
   </div>
 

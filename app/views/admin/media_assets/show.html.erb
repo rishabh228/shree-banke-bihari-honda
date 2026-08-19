@@ -1,0 +1,44 @@
+<% content_for :page_title, @media_asset.title %>
+<% content_for :page_subtitle, "Media asset" %>
+
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <%= render "shared/status_badge", status: "published", label: (@media_asset.file_type.presence || "file").humanize %>
+  <div class="flex flex-wrap gap-2">
+    <%= link_to "Edit", edit_admin_media_asset_path(@media_asset), class: "btn-secondary" %>
+    <%= link_to "Back", admin_media_assets_path, class: "btn-secondary" %>
+    <% if policy(@media_asset).destroy? %>
+      <%= button_to "Delete", admin_media_asset_path(@media_asset), method: :delete, data: { turbo_confirm: "Delete this media asset?" }, class: "rounded-lg border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <div class="lg:col-span-2 card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Details</h2>
+    <dl class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div><dt class="text-xs text-gray-500">Title</dt><dd class="text-sm font-medium"><%= @media_asset.title %></dd></div>
+      <div><dt class="text-xs text-gray-500">Type</dt><dd class="text-sm font-medium"><%= (@media_asset.file_type.presence || "—").humanize %></dd></div>
+      <div class="sm:col-span-2">
+        <dt class="text-xs text-gray-500">Description</dt>
+        <dd class="mt-1 text-sm text-gray-700"><%= @media_asset.description.present? ? simple_format(@media_asset.description) : "—" %></dd>
+      </div>
+      <% if @media_asset.file.attached? %>
+        <div><dt class="text-xs text-gray-500">Filename</dt><dd class="text-sm font-medium"><%= @media_asset.file.filename %></dd></div>
+        <div><dt class="text-xs text-gray-500">Content type</dt><dd class="text-sm font-medium"><%= @media_asset.file.content_type %></dd></div>
+      <% end %>
+      <div><dt class="text-xs text-gray-500">Uploaded</dt><dd class="text-sm font-medium"><%= @media_asset.created_at.strftime("%d %b %Y") %></dd></div>
+    </dl>
+    <% if @media_asset.file.attached? %>
+      <div class="mt-6">
+        <%= link_to "Download", rails_blob_path(@media_asset.file, disposition: "attachment"), class: "btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @media_asset.file.attached? && @media_asset.file_type == "image" %>
+    <div class="card p-6">
+      <h3 class="font-display text-lg font-semibold text-honda-dark">Preview</h3>
+      <%= image_tag @media_asset.file, class: "mt-4 w-full rounded-lg object-cover" %>
+    </div>
+  <% end %>
+</div>

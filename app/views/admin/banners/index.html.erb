@@ -60,7 +60,8 @@
                 <%= render "shared/status_badge", status: banner.active? ? "active" : "inactive", label: banner.active? ? "Active" : "Inactive" %>
               </td>
               <td class="px-6 py-4 text-right text-sm">
-                <%= link_to "Edit", edit_admin_banner_path(banner), class: "font-semibold text-honda-red hover:text-red-700" %>
+                <%= link_to "View", admin_banner_path(banner), class: "font-semibold text-honda-red hover:text-red-700" %>
+                <%= link_to "Edit", edit_admin_banner_path(banner), class: "ml-3 font-semibold text-gray-600 hover:text-honda-dark" %>
               </td>
             </tr>
           <% end %>

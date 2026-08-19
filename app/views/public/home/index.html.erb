@@ -317,6 +317,34 @@
   </div>
 </section>
 
+<%# ── News ── %>
+<% if @news_banners.any? %>
+  <section class="bg-white py-16 lg:py-20" aria-labelledby="news-heading">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex items-end justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-widest text-honda-red">Dealership</p>
+          <h2 id="news-heading" class="mt-2 font-display text-3xl font-bold text-honda-dark">News & updates</h2>
+        </div>
+        <%= link_to "Gallery", gallery_path, class: "btn-secondary shrink-0" %>
+      </div>
+      <div class="mt-8 grid gap-6 md:grid-cols-3">
+        <% @news_banners.each do |banner| %>
+          <article class="card p-6">
+            <h3 class="font-display font-semibold text-honda-dark"><%= banner.title.presence || "Update" %></h3>
+            <% if banner.subtitle.present? %>
+              <p class="mt-2 text-sm text-gray-600"><%= banner.subtitle %></p>
+            <% end %>
+            <% if banner.link.present? %>
+              <%= link_to "Read more", banner.link, class: "mt-3 inline-block text-sm font-semibold text-honda-red hover:underline", target: "_blank", rel: "noopener noreferrer" %>
+            <% end %>
+          </article>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>
+
 <%# ── Testimonials (placeholder) ── %>
 <section class="bg-gray-100 py-16 lg:py-24" aria-labelledby="testimonials-heading">
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

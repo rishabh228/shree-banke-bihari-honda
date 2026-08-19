@@ -1,0 +1,40 @@
+<% content_for :page_title, @banner.title.presence || "Banner ##{@banner.id}" %>
+<% content_for :page_subtitle, "Banner details" %>
+
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <%= render "shared/status_badge", status: @banner.active? ? "active" : "inactive", label: @banner.active? ? "Active" : "Inactive" %>
+  <div class="flex flex-wrap gap-2">
+    <%= link_to "Edit", edit_admin_banner_path(@banner), class: "btn-secondary" %>
+    <%= link_to "Back", admin_banners_path, class: "btn-secondary" %>
+    <%= button_to "Delete", admin_banner_path(@banner), method: :delete, data: { turbo_confirm: "Delete this banner?" }, class: "rounded-lg border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100" %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <div class="lg:col-span-2 card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Details</h2>
+    <dl class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div><dt class="text-xs text-gray-500">Title</dt><dd class="text-sm font-medium"><%= @banner.title.presence || "Untitled" %></dd></div>
+      <div><dt class="text-xs text-gray-500">Subtitle</dt><dd class="text-sm font-medium"><%= @banner.subtitle.presence || "—" %></dd></div>
+      <div><dt class="text-xs text-gray-500">Section</dt><dd class="text-sm font-medium"><%= @banner.section.humanize.titleize %></dd></div>
+      <div><dt class="text-xs text-gray-500">Position</dt><dd class="text-sm font-medium"><%= @banner.position %></dd></div>
+      <div class="sm:col-span-2">
+        <dt class="text-xs text-gray-500">Link URL</dt>
+        <dd class="text-sm font-medium">
+          <% if @banner.link.present? %>
+            <%= link_to @banner.link, @banner.link, target: "_blank", rel: "noopener noreferrer", class: "text-honda-red hover:underline" %>
+          <% else %>
+            —
+          <% end %>
+        </dd>
+      </div>
+    </dl>
+  </div>
+
+  <% if @banner.image.attached? %>
+    <div class="card p-6">
+      <h3 class="font-display text-lg font-semibold text-honda-dark">Image</h3>
+      <%= image_tag @banner.image, class: "mt-4 w-full rounded-lg object-cover" %>
+    </div>
+  <% end %>
+</div>

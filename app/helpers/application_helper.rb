@@ -9,6 +9,12 @@ module ApplicationHelper
     number_to_currency(amount, unit: "₹", precision: 0, format: "%u %n")
   end
 
+  def format_amount(amount)
+    return "—" if amount.blank?
+
+    number_to_currency(amount, unit: "₹", precision: 2, format: "%u %n")
+  end
+
   def status_color(status)
     key = status.to_s.downcase
 
@@ -44,7 +50,9 @@ module ApplicationHelper
     # Stock
     "in_stock" => "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
     "low_stock" => "bg-amber-50 text-amber-700 ring-amber-600/20",
-    "out_of_stock" => "bg-red-50 text-red-700 ring-red-600/20"
+    "out_of_stock" => "bg-red-50 text-red-700 ring-red-600/20",
+    "allotted" => "bg-violet-50 text-violet-700 ring-violet-600/20",
+    "issued" => "bg-emerald-50 text-emerald-700 ring-emerald-600/20"
   }.freeze
   private_constant :STATUS_COLORS
 
@@ -103,12 +111,36 @@ module ApplicationHelper
   def stock_status_badge(variant)
     label, status_key = if !variant.available? || variant.out_of_stock?
                           [ "Out of Stock", "out_of_stock" ]
-                        elsif variant.low_stock?
+    elsif variant.low_stock?
                           [ "Low Stock (#{variant.stock_quantity})", "low_stock" ]
-                        else
+    else
                           [ "#{variant.stock_quantity} in stock", "in_stock" ]
-                        end
+    end
 
     render partial: "shared/status_badge", locals: { status: status_key, label: label }
+  end
+
+  def showroom_logo_tag(html_class: "h-10 w-auto object-contain")
+    alt = current_settings&.showroom_name.presence || "Honda"
+    if current_settings&.logo&.attached?
+      image_tag current_settings.logo, alt: alt, class: html_class
+    else
+      image_tag "honda_logo.png", alt: alt, class: html_class
+    end
+  end
+
+  def published_cms_page(slug)
+    Page.published_pages.find_by(slug: slug)
+  end
+
+  def cms_page_url_for(page)
+    case page.slug
+    when "about" then about_path
+    when "contact" then contact_path
+    when "privacy" then privacy_path
+    when "terms" then terms_path
+    when "faq" then faq_path
+    else cms_page_path(page.slug)
+    end
   end
 end

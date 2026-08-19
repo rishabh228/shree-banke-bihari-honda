@@ -14,6 +14,23 @@ Setting.instance.update!(
   contact_page_heading: "Contact Us",
   contact_page_intro: "Visit our showroom, call us, or send a message — we're here to help with sales, service, finance, and insurance.",
   footer_tagline: "Your trusted authorized Honda two-wheeler dealership in the region.",
+  gstin: "09AAAAA0000A1Z5",
+  pan: "AAAAA0000A",
+  state: "Uttar Pradesh",
+  state_code: "09",
+  invoice_prefix: "SBH",
+  legal_name: "Shree Banke Bihari Honda",
+  dealer_code: "UP-DEMO-001",
+  bank_name: "State Bank of India",
+  bank_account_number: "00000000000",
+  bank_ifsc: "SBIN0000000",
+  upi_id: "sbhhonda@upi",
+  handling_hsn: "998599",
+  handling_gst_rate: 18,
+  vehicle_hsn: "8711",
+  accessories_hsn: "871410",
+  vehicle_gst_rate: 28,
+  accessories_gst_rate: 18,
   facebook: "https://facebook.com/",
   instagram: "https://instagram.com/",
   youtube: "https://youtube.com/",
@@ -225,6 +242,102 @@ shine_variant = shine.bike_variants.first
   sale.assign_attributes(attrs)
   sale.bike_variant = variant
   sale.save!
+end
+
+Bike.published_bikes.find_each do |bike|
+  bike.update!(hsn_code: bike.hsn_code.presence || "8711", gst_rate: bike.gst_rate.presence || 28)
+end
+
+[
+  [ activa_variant, "ME4TC58A0A0001001", "JF49E1000001" ],
+  [ activa_variant, "ME4TC58A0A0001002", "JF49E1000002" ],
+  [ shine_variant, "ME4KC21A0A0002001", "HA11E2000001" ]
+].each do |variant, chassis, engine|
+  VehicleUnit.find_or_create_by!(chassis_number: chassis) do |unit|
+    unit.bike_variant = variant
+    unit.engine_number = engine
+    unit.status = :in_stock
+    unit.received_on = Date.current
+  end
+end
+
+rahul = Sale.find_by(customer_name: "Rahul Sharma", phone: "9876543210")
+if rahul
+  unit = VehicleUnit.find_or_create_by!(chassis_number: "CH123456") do |record|
+    record.bike_variant = activa_variant
+    record.engine_number = "EN789012"
+    record.status = :delivered
+    record.sale = rahul
+    record.received_on = 12.days.ago.to_date
+  end
+  rahul.update_columns(vehicle_unit_id: unit.id, chassis_number: "CH123456", engine_number: "EN789012")
+  Billing::IssueInvoiceService.new(rahul).call unless rahul.invoiced?
+  if rahul.payment_receipts.none?
+    Billing::CreateReceiptService.new(
+      rahul,
+      { amount: 5_000, payment_mode: :cash, received_on: rahul.booked_on, notes: "Booking token" },
+      received_by: sales_exec
+    ).call
+  end
+end
+
+end
+
+enquiry_bike = Bike.published_bikes.first
+if enquiry_bike
+  Enquiry.find_or_create_by!(phone: "9000000001", source: :bike_enquiry) do |enquiry|
+    enquiry.name = "Neha Gupta"
+    enquiry.email = "neha@example.com"
+    enquiry.message = "Need on-road price for Activa and finance options."
+    enquiry.bike = enquiry_bike
+    enquiry.status = :new_enquiry
+  end
+
+  TestRide.find_or_create_by!(phone: "9000000002", bike: enquiry_bike) do |ride|
+    ride.name = "Vikram Singh"
+    ride.email = "vikram@example.com"
+    ride.preferred_date = Date.current + 1
+    ride.preferred_time = "11:00 AM"
+    ride.status = :pending
+  end
+end
+
+service_advisor = User.find_by!(email: "service@shreebankebiharihonda.com")
+booking = ServiceBooking.find_or_create_by!(phone: "9000000003", vehicle_number: "UP32AB1234") do |record|
+  record.customer_name = "Amit Service"
+  record.email = "amit.service@example.com"
+  record.bike_model = "Honda Activa 6G"
+  record.service_type = "paid"
+  record.preferred_date = Date.current
+  record.complaint = "Engine noise and free service check."
+  record.status = :assigned
+  record.assigned_to = service_advisor
+end
+
+if booking.job_card.blank?
+  Billing::EnsureJobCardService.new(booking).call
+end
+
+helmet = Accessory.first
+if helmet
+  spare = CounterInvoice.find_or_initialize_by(customer_name: "Walk-in helmet", phone: "9000000004", kind: :spare)
+  if spare.new_record?
+    spare.assign_attributes(status: :draft, buyer_state: "Uttar Pradesh", buyer_state_code: "09")
+    spare.save!
+    Billing::AddCounterLineService.new(spare, accessory_id: helmet.id, quantity: 1).call
+    Billing::IssueCounterInvoiceService.new(spare, issued_by: sales_exec).call
+  end
+end
+
+Banner.find_or_create_by!(title: "Monsoon service camp", section: "news") do |banner|
+  banner.subtitle = "Free 15-point check this weekend at the workshop."
+  banner.position = 0
+  banner.active = true
+end
+
+admin.notifications.find_or_create_by!(title: "New enquiry from website") do |note|
+  note.body = "Neha Gupta requested on-road pricing."
+  note.notifiable = Enquiry.find_by(phone: "9000000001")
 end
 
 puts "Seed complete!"

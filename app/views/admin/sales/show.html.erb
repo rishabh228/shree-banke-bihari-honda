@@ -5,15 +5,41 @@
   <div class="flex flex-wrap items-center gap-3">
     <%= render "shared/status_badge", status: @sale.status %>
     <span class="text-sm text-gray-500"><%= @sale.display_payment_mode %></span>
+    <% if @sale.invoiced? %>
+      <%= render "shared/status_badge", status: "issued", label: @sale.tax_invoice.invoice_number %>
+    <% end %>
   </div>
   <div class="flex flex-wrap gap-2">
-    <%= link_to "Download Quotation PDF", quotation_pdf_admin_sale_path(@sale), class: "btn-secondary", data: { turbo: false } %>
+    <%= link_to "Quotation PDF", quotation_pdf_admin_sale_path(@sale), class: "btn-secondary", data: { turbo: false } %>
+    <% if @sale.invoices.any? %>
+      <%= link_to "Original", invoice_pdf_admin_sale_path(@sale, copy: "original"), class: "btn-primary", data: { turbo: false } %>
+      <%= link_to "Duplicate", invoice_pdf_admin_sale_path(@sale, copy: "duplicate"), class: "btn-secondary", data: { turbo: false } %>
+      <%= link_to "Triplicate", invoice_pdf_admin_sale_path(@sale, copy: "triplicate"), class: "btn-secondary", data: { turbo: false } %>
+    <% end %>
+    <% unless @sale.invoiced? %>
+      <% if policy(@sale).issue_invoice? %>
+        <%= button_to "Issue Tax Invoice", issue_invoice_admin_sale_path(@sale), method: :post, class: "btn-primary" %>
+      <% end %>
+    <% end %>
+    <% if @sale.credit_noted? %>
+      <%= link_to "Latest credit note PDF", credit_note_pdf_admin_sale_path(@sale), class: "btn-secondary", data: { turbo: false } %>
+    <% end %>
+    <%= link_to "Delivery Challan", delivery_challan_pdf_admin_sale_path(@sale, copy: "original"), class: "btn-secondary", data: { turbo: false } %>
+    <%= link_to "Form 21", form21_pdf_admin_sale_path(@sale), class: "btn-secondary", data: { turbo: false } %>
+    <%= link_to "Form 22", form22_pdf_admin_sale_path(@sale), class: "btn-secondary", data: { turbo: false } %>
+    <%= link_to "Gate Pass", gate_pass_pdf_admin_sale_path(@sale), class: "btn-secondary", data: { turbo: false } %>
     <%= link_to "Edit", edit_admin_sale_path(@sale), class: "btn-secondary" %>
     <% if policy(@sale).destroy? %>
       <%= button_to "Delete", admin_sale_path(@sale), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "rounded-lg border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700" %>
     <% end %>
   </div>
 </div>
+
+<% unless current_settings.billing_ready? %>
+  <div class="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+    Add the showroom GSTIN in <%= link_to "Settings", edit_admin_settings_path, class: "font-semibold underline" %> before issuing a tax invoice.
+  </div>
+<% end %>
 
 <% if allowed_status_transitions(@sale).any? %>
   <div class="card mb-6 p-4">
@@ -33,6 +59,8 @@
       <div><dt class="text-gray-500">Phone</dt><dd class="font-medium"><%= @sale.phone %></dd></div>
       <div><dt class="text-gray-500">Email</dt><dd class="font-medium"><%= @sale.email.presence || "—" %></dd></div>
       <div><dt class="text-gray-500">Address</dt><dd class="font-medium"><%= @sale.address.presence || "—" %></dd></div>
+      <div><dt class="text-gray-500">Buyer GSTIN / PAN</dt><dd class="font-medium"><%= [ @sale.buyer_gstin, @sale.buyer_pan ].compact_blank.join(" / ").presence || "—" %></dd></div>
+      <div><dt class="text-gray-500">Buyer state / code</dt><dd class="font-medium"><%= [ @sale.buyer_state.presence || current_settings.state.presence, @sale.buyer_state_code.presence || current_settings.state_code.presence ].compact.join(" / ").presence || "Same as showroom" %></dd></div>
     </dl>
   </div>
 
@@ -41,27 +69,266 @@
     <dl class="mt-4 space-y-3 text-sm">
       <div><dt class="text-gray-500">Bike</dt><dd class="font-medium"><%= @sale.bike.name %></dd></div>
       <div><dt class="text-gray-500">Variant</dt><dd class="font-medium"><%= @sale.bike_variant&.name || "—" %> <%= @sale.bike_variant&.color.present? ? "(#{@sale.bike_variant.color})" : "" %></dd></div>
+      <div><dt class="text-gray-500">HSN / GST</dt><dd class="font-medium"><%= @sale.bike.hsn %> · <%= @sale.bike.tax_rate.to_f %>%</dd></div>
       <div><dt class="text-gray-500">Sales Executive</dt><dd class="font-medium"><%= @sale.sales_executive.name %></dd></div>
-      <div><dt class="text-gray-500">Chassis / Engine</dt><dd class="font-medium"><%= [@sale.chassis_number, @sale.engine_number].compact.join(" / ").presence || "—" %></dd></div>
+      <div><dt class="text-gray-500">Chassis / Engine</dt><dd class="font-medium"><%= [ @sale.chassis_number, @sale.engine_number ].compact_blank.join(" / ").presence || "Not allotted" %></dd></div>
+      <div><dt class="text-gray-500">Hypothecation</dt><dd class="font-medium"><%= @sale.hypothecated? ? [ @sale.finance_partner, (format_price(@sale.loan_amount) if @sale.loan_amount.to_d.positive?) ].compact.join(" · ") : "—" %></dd></div>
     </dl>
+
+    <% if @sale.vehicle_unit.blank? && policy(@sale).allot_chassis? %>
+      <div class="mt-6 border-t border-gray-100 pt-4">
+        <p class="mb-2 text-sm font-medium text-gray-700">Allot chassis from stock</p>
+        <% if @available_units.any? %>
+          <%= form_with url: allot_chassis_admin_sale_path(@sale), method: :patch, class: "flex flex-col gap-3 sm:flex-row" do %>
+            <%= select_tag :vehicle_unit_id,
+                  options_from_collection_for_select(@available_units, :id, :display_label),
+                  class: "input-field min-w-0 flex-1" %>
+            <%= submit_tag "Allot", class: "btn-primary cursor-pointer" %>
+          <% end %>
+        <% else %>
+          <p class="text-sm text-gray-500">No in-stock units for this variant. <%= link_to "Add chassis stock", new_admin_vehicle_unit_path, class: "font-semibold text-honda-red" %>.</p>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 
   <div class="card p-6 lg:col-span-2">
-    <h2 class="font-display text-lg font-semibold text-honda-dark">Pricing</h2>
-    <dl class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 text-sm">
-      <div><dt class="text-gray-500">Ex-Showroom</dt><dd class="font-medium"><%= format_price(@sale.ex_showroom_price) %></dd></div>
-      <div><dt class="text-gray-500">Insurance</dt><dd class="font-medium"><%= format_price(@sale.insurance) %></dd></div>
-      <div><dt class="text-gray-500">RTO</dt><dd class="font-medium"><%= format_price(@sale.rto) %></dd></div>
-      <div><dt class="text-gray-500">Other Charges</dt><dd class="font-medium"><%= format_price(@sale.other_charges) %></dd></div>
-      <div><dt class="text-gray-500">Total On-Road</dt><dd class="text-lg font-bold text-honda-red"><%= format_price(@sale.total_price) %></dd></div>
-      <div><dt class="text-gray-500">Booking Paid</dt><dd class="font-medium"><%= format_price(@sale.booking_amount) %></dd></div>
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Bill lines (GST preview)</h2>
+    <p class="mt-1 text-xs text-gray-500">Ex-showroom, handling and accessories are GST-inclusive. Insurance and RTO are collected on behalf of the insurer / RTO. Place of supply: <%= @tax_breakdown[:place_of_supply] %> (<%= @tax_breakdown[:place_of_supply_code].presence || "—" %>).</p>
+    <div class="mt-4 overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-3 py-2 text-left text-xs font-semibold uppercase text-gray-500">Description</th>
+            <th class="px-3 py-2 text-left text-xs font-semibold uppercase text-gray-500">HSN</th>
+            <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500">Qty</th>
+            <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500">Taxable</th>
+            <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500">GST</th>
+            <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500">Amount</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <% @tax_breakdown[:lines].each do |line| %>
+            <tr>
+              <td class="px-3 py-2">
+                <%= line[:description] %>
+                <% if line[:collected] %><span class="ml-1 text-xs text-gray-500">(collected)</span><% end %>
+              </td>
+              <td class="px-3 py-2 text-gray-600"><%= line[:hsn_code].presence || "—" %></td>
+              <td class="px-3 py-2 text-right"><%= line[:quantity].to_i %> <%= line[:uqc] %></td>
+              <td class="px-3 py-2 text-right"><%= line[:collected] ? "—" : format_amount(line[:taxable_value]) %></td>
+              <td class="px-3 py-2 text-right"><%= line[:collected] ? "—" : format_amount(line[:cgst_amount].to_d + line[:sgst_amount].to_d + line[:igst_amount].to_d) %></td>
+              <td class="px-3 py-2 text-right font-medium"><%= format_amount(line[:inclusive_amount]) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <dl class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4 text-sm">
+      <div><dt class="text-gray-500">Handling</dt><dd class="font-medium"><%= format_amount(@sale.handling_charge) %></dd></div>
+      <div><dt class="text-gray-500">Accessories pack</dt><dd class="font-medium"><%= format_amount(@sale.accessories_charge) %></dd></div>
+      <div><dt class="text-gray-500">Dealer discount</dt><dd class="font-medium"><%= format_amount(@sale.discount_value) %><% if @sale.discount_percent.to_d.positive? %> <span class="text-xs text-gray-500">(<%= @sale.discount_percent %>%)</span><% end %></dd></div>
+      <div><dt class="text-gray-500">Total on-road</dt><dd class="text-lg font-bold text-honda-red"><%= format_amount(@sale.total_price) %></dd></div>
+      <div><dt class="text-gray-500">Outstanding</dt><dd class="text-lg font-bold"><%= format_amount(@sale.outstanding_amount) %></dd></div>
     </dl>
   </div>
 </div>
 
-<% if @sale.notes.present? %>
-  <div class="card mt-6 p-6">
-    <h2 class="font-display text-lg font-semibold text-honda-dark">Notes</h2>
-    <p class="mt-2 text-sm text-gray-700"><%= simple_format @sale.notes %></p>
+<div class="mt-6 card p-6">
+  <div class="mb-4 flex items-center justify-between">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Accessory lines</h2>
   </div>
-<% end %>
+  <% if @sale.sale_add_ons.any? %>
+    <div class="mb-4 overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-3 py-2 text-left text-xs font-semibold uppercase text-gray-500">Item</th>
+            <th class="px-3 py-2 text-left text-xs font-semibold uppercase text-gray-500">HSN / GST</th>
+            <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500">Qty</th>
+            <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500">Unit</th>
+            <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500">Amount</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <% @sale.sale_add_ons.each do |add_on| %>
+            <tr>
+              <td class="px-3 py-2 font-medium"><%= add_on.description %></td>
+              <td class="px-3 py-2 text-gray-600"><%= [ add_on.hsn_code, ("#{add_on.gst_rate.to_f}%" if add_on.gst_rate.present?) ].compact.join(" · ") %></td>
+              <td class="px-3 py-2 text-right"><%= add_on.quantity %></td>
+              <td class="px-3 py-2 text-right"><%= format_amount(add_on.unit_price) %></td>
+              <td class="px-3 py-2 text-right font-medium"><%= format_amount(add_on.line_total) %></td>
+              <td class="px-3 py-2 text-right">
+                <% if !@sale.invoiced? && policy(@sale).update? %>
+                  <%= button_to "Remove", admin_sale_sale_add_on_path(@sale, add_on), method: :delete, data: { turbo_confirm: "Remove this accessory line?" }, class: "text-xs text-red-600" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="mb-4 text-sm text-gray-500">No separate accessory lines yet. Pack amount on the sale is billed as one OEM accessories line.</p>
+  <% end %>
+
+  <% if !@sale.invoiced? && !@sale.cancelled? && policy(@sale).update? %>
+    <%= form_with model: @sale_add_on, url: admin_sale_sale_add_ons_path(@sale), class: "grid grid-cols-1 gap-3 border-t border-gray-100 pt-4 sm:grid-cols-6" do |f| %>
+      <div class="sm:col-span-2">
+        <%= f.label :accessory_id, "From catalogue", class: "mb-1 block text-xs text-gray-500" %>
+        <%= f.collection_select :accessory_id, @accessories, :id, :name, { include_blank: "Custom line" }, class: "input-field w-full" %>
+      </div>
+      <div class="sm:col-span-2">
+        <%= f.label :description, class: "mb-1 block text-xs text-gray-500" %>
+        <%= f.text_field :description, class: "input-field w-full", placeholder: "Helmet / cover / etc." %>
+      </div>
+      <div>
+        <%= f.label :quantity, class: "mb-1 block text-xs text-gray-500" %>
+        <%= f.number_field :quantity, min: 1, class: "input-field w-full" %>
+      </div>
+      <div>
+        <%= f.label :unit_price, "Unit (incl. GST)", class: "mb-1 block text-xs text-gray-500" %>
+        <%= f.number_field :unit_price, step: 0.01, min: 0, class: "input-field w-full" %>
+      </div>
+      <div class="sm:col-span-6">
+        <%= f.submit "Add accessory line", class: "btn-primary cursor-pointer" %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+
+<div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+  <div class="card p-6">
+    <div class="mb-4 flex items-center justify-between">
+      <h2 class="font-display text-lg font-semibold text-honda-dark">Payment receipts</h2>
+      <span class="text-sm text-gray-500">Received <%= format_amount(@sale.amount_received) %></span>
+    </div>
+
+    <% if @sale.payment_receipts.any? %>
+      <div class="mb-6 overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-3 py-2 text-left text-xs font-semibold uppercase text-gray-500">Receipt</th>
+              <th class="px-3 py-2 text-left text-xs font-semibold uppercase text-gray-500">Head</th>
+              <th class="px-3 py-2 text-left text-xs font-semibold uppercase text-gray-500">Date</th>
+              <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500">Amount</th>
+              <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <% @sale.payment_receipts.recent.each do |receipt| %>
+              <tr>
+                <td class="px-3 py-2">
+                  <div class="font-medium"><%= receipt.receipt_number %></div>
+                  <div class="text-xs text-gray-500"><%= receipt.display_payment_mode %></div>
+                </td>
+                <td class="px-3 py-2 text-gray-600"><%= receipt.display_head %></td>
+                <td class="px-3 py-2 text-gray-600"><%= receipt.received_on.strftime("%d %b %Y") %></td>
+                <td class="px-3 py-2 text-right font-medium"><%= format_amount(receipt.amount) %></td>
+                <td class="px-3 py-2 text-right">
+                  <%= link_to "PDF", pdf_admin_sale_payment_receipt_path(@sale, receipt), class: "font-semibold text-honda-red", data: { turbo: false } %>
+                  <% if policy(@sale).destroy_receipt? %>
+                    <%= button_to "Delete", admin_sale_payment_receipt_path(@sale, receipt), method: :delete, data: { turbo_confirm: "Delete this receipt?" }, class: "ml-2 inline text-xs text-red-600" %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="mb-4 text-sm text-gray-500">No receipts yet. Record the booking token and later balance payments here.</p>
+    <% end %>
+
+    <% if policy(@sale).create_receipt? && @sale.outstanding_amount.positive? && !@sale.cancelled? %>
+      <%= form_with model: @payment_receipt, url: admin_sale_payment_receipts_path(@sale), class: "space-y-3 border-t border-gray-100 pt-4" do |f| %>
+        <p class="text-sm font-medium text-gray-700">Record payment</p>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div><%= f.label :amount, class: "mb-1 block text-xs text-gray-500" %><%= f.number_field :amount, step: 0.01, min: 0.01, max: @sale.outstanding_amount, class: "input-field w-full", required: true %></div>
+          <div>
+            <%= f.label :payment_mode, class: "mb-1 block text-xs text-gray-500" %>
+            <%= f.select :payment_mode, PaymentReceipt.payment_modes.keys.map { |k| [ k.humanize.titleize, k ] }, {}, class: "input-field w-full" %>
+          </div>
+          <div>
+            <%= f.label :receipt_head, "Head", class: "mb-1 block text-xs text-gray-500" %>
+            <%= f.select :receipt_head, PaymentReceipt.receipt_heads.keys.map { |k| [ k.humanize.titleize, k ] }, {}, class: "input-field w-full" %>
+          </div>
+          <div><%= f.label :received_on, class: "mb-1 block text-xs text-gray-500" %><%= f.date_field :received_on, class: "input-field w-full" %></div>
+          <div><%= f.label :reference_no, "UPI / cheque / loan ref", class: "mb-1 block text-xs text-gray-500" %><%= f.text_field :reference_no, class: "input-field w-full" %></div>
+          <div class="sm:col-span-2"><%= f.label :notes, class: "mb-1 block text-xs text-gray-500" %><%= f.text_field :notes, class: "input-field w-full" %></div>
+        </div>
+        <%= f.submit "Save receipt", class: "btn-primary cursor-pointer" %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Billing documents</h2>
+    <dl class="mt-4 space-y-3 text-sm">
+      <div>
+        <dt class="text-gray-500">Tax invoice</dt>
+        <dd class="font-medium">
+          <% if @sale.tax_invoice %>
+            <%= @sale.tax_invoice.invoice_number %> (issued)
+          <% elsif @sale.invoices.any? %>
+            <%= @sale.invoices.order(created_at: :desc).first.invoice_number %> (cancelled)
+          <% else %>
+            Not issued
+          <% end %>
+        </dd>
+      </div>
+      <div>
+        <dt class="text-gray-500">Credit notes</dt>
+        <dd class="font-medium"><%= @sale.credit_notes.any? ? "#{@sale.credit_notes.size} issued" : "—" %></dd>
+      </div>
+      <div><dt class="text-gray-500">Delivery challan</dt><dd class="font-medium"><%= @sale.delivery_challan&.challan_number || "Generated on first download" %></dd></div>
+      <div><dt class="text-gray-500">Gate pass</dt><dd class="font-medium"><%= @sale.gate_pass&.gate_pass_number || "Generated on first download" %></dd></div>
+      <div><dt class="text-gray-500">Form 21 / 22</dt><dd class="font-medium">Draft PDFs for RTO file</dd></div>
+      <div><dt class="text-gray-500">e-Invoice IRN</dt><dd class="font-medium break-all"><%= @sale.tax_invoice&.irn.presence || (@sale.invoiced? && @sale.buyer_gstin.present? ? "Pending — paste from GSP / HiRise" : "Not applicable (B2C)") %></dd></div>
+    </dl>
+
+    <% if @sale.delivery_challan %>
+      <div class="mt-4 flex flex-wrap gap-2 text-sm">
+        <%= link_to "Challan original", delivery_challan_pdf_admin_sale_path(@sale, copy: "original"), class: "font-semibold text-honda-red", data: { turbo: false } %>
+        <%= link_to "Duplicate", delivery_challan_pdf_admin_sale_path(@sale, copy: "duplicate"), class: "font-semibold text-honda-red", data: { turbo: false } %>
+        <%= link_to "Triplicate", delivery_challan_pdf_admin_sale_path(@sale, copy: "triplicate"), class: "font-semibold text-honda-red", data: { turbo: false } %>
+      </div>
+    <% end %>
+
+    <% if @sale.invoiced? && policy(@sale).capture_irn? %>
+      <%= form_with url: capture_irn_admin_sale_path(@sale), method: :patch, class: "mt-6 space-y-3 border-t border-gray-100 pt-4" do %>
+        <p class="text-sm font-medium text-gray-700">Record IRN from Honda HiRise / GSP</p>
+        <p class="text-xs text-gray-500">This app does not call the NIC IRP. Paste the IRN after the OEM / GSP registers the invoice.</p>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <%= text_field_tag :irn, @sale.tax_invoice&.irn, required: true, placeholder: "IRN", class: "input-field w-full sm:col-span-3" %>
+          <%= text_field_tag :ack_no, @sale.tax_invoice&.ack_no, placeholder: "Ack no.", class: "input-field w-full" %>
+          <%= date_field_tag :ack_date, @sale.tax_invoice&.ack_date, class: "input-field w-full" %>
+        </div>
+        <%= submit_tag "Save IRN", class: "btn-secondary cursor-pointer" %>
+      <% end %>
+    <% end %>
+
+    <% if @sale.invoiced? && policy(@sale).cancel_invoice? %>
+      <% invoice = @sale.tax_invoice %>
+      <%= form_with url: cancel_invoice_admin_sale_path(@sale), method: :post, class: "mt-6 space-y-3 border-t border-gray-100 pt-4" do %>
+        <p class="text-sm font-medium text-gray-700">Issue credit note</p>
+        <p class="text-xs text-gray-500">Remaining invoice value: <%= format_amount(invoice.remaining_value) %>. A partial amount keeps the tax invoice open. Reversing the remainder cancels it.</p>
+        <%= text_field_tag :reason, nil, required: true, placeholder: "Reason (return / cancellation / correction)", class: "input-field w-full" %>
+        <%= number_field_tag :amount, invoice.remaining_value, min: 0.01, max: invoice.remaining_value, step: 0.01, class: "input-field w-full", aria: { label: "Credit amount" } %>
+        <div class="flex flex-wrap gap-2">
+          <%= submit_tag "Issue partial credit note", class: "btn-secondary cursor-pointer" %>
+          <%= submit_tag "Reverse remaining in full", name: "full", value: "1", class: "rounded-lg border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700 cursor-pointer", data: { turbo_confirm: "This cancels the tax invoice and issues a credit note for the remaining value. Continue?" } %>
+        </div>
+      <% end %>
+    <% end %>
+    <%= render "admin/shared/credit_notes", notes: @sale.credit_notes.order(created_at: :desc), pdf_path: ->(note) { credit_note_pdf_admin_sale_path(@sale, credit_note_id: note.id) } %>
+    <% if @sale.notes.present? %>
+      <div class="mt-6 border-t border-gray-100 pt-4">
+        <h3 class="text-sm font-medium text-gray-700">Notes</h3>
+        <p class="mt-2 text-sm text-gray-700"><%= simple_format @sale.notes %></p>
+      </div>
+    <% end %>
+  </div>
+</div>

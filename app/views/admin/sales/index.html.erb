@@ -42,6 +42,7 @@
             <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Booking</th>
             <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Executive</th>
             <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Invoice</th>
             <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-500">Actions</th>
           </tr>
         </thead>
@@ -60,6 +61,7 @@
               <td class="px-6 py-4 text-sm text-gray-700"><%= format_price(sale.booking_amount) %></td>
               <td class="px-6 py-4 text-sm text-gray-600"><%= sale.sales_executive.name %></td>
               <td class="px-6 py-4"><%= render "shared/status_badge", status: sale.status %></td>
+              <td class="px-6 py-4 text-xs text-gray-600"><%= sale.tax_invoice&.invoice_number || "—" %></td>
               <td class="px-6 py-4 text-right text-sm">
                 <%= link_to "View", admin_sale_path(sale), class: "font-semibold text-honda-red hover:text-red-700" %>
               </td>

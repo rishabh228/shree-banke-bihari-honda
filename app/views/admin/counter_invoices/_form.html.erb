@@ -1,0 +1,30 @@
+<%= form_with model: [ :admin, counter_invoice ], class: "space-y-6" do |f| %>
+  <% if counter_invoice.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      <ul class="list-disc pl-5"><% counter_invoice.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %></ul>
+    </div>
+  <% end %>
+
+  <div class="card p-6">
+    <h2 class="font-display mb-4 text-lg font-semibold text-honda-dark">Customer</h2>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div><%= f.label :customer_name, class: "mb-1 block text-sm font-medium" %><%= f.text_field :customer_name, class: "input-field w-full", required: true %></div>
+      <div><%= f.label :phone, class: "mb-1 block text-sm font-medium" %><%= f.telephone_field :phone, class: "input-field w-full" %></div>
+      <div><%= f.label :email, class: "mb-1 block text-sm font-medium" %><%= f.email_field :email, class: "input-field w-full" %></div>
+      <div class="sm:col-span-2"><%= f.label :address, class: "mb-1 block text-sm font-medium" %><%= f.text_area :address, rows: 2, class: "input-field w-full" %></div>
+      <div><%= f.label :buyer_gstin, "Buyer GSTIN (B2B)", class: "mb-1 block text-sm font-medium" %><%= f.text_field :buyer_gstin, class: "input-field w-full", maxlength: 15 %></div>
+      <div><%= f.label :buyer_pan, class: "mb-1 block text-sm font-medium" %><%= f.text_field :buyer_pan, class: "input-field w-full", maxlength: 10 %></div>
+      <div><%= f.label :buyer_state, class: "mb-1 block text-sm font-medium" %><%= f.text_field :buyer_state, class: "input-field w-full" %></div>
+      <div><%= f.label :buyer_state_code, "GST state code", class: "mb-1 block text-sm font-medium" %><%= f.text_field :buyer_state_code, class: "input-field w-full", maxlength: 2 %></div>
+      <div><%= f.label :discount_percent, "Discount %", class: "mb-1 block text-sm font-medium" %><%= f.number_field :discount_percent, step: 0.01, min: 0, max: 100, class: "input-field w-full" %></div>
+      <div><%= f.label :discount_amount, "Discount amount (incl. GST)", class: "mb-1 block text-sm font-medium" %><%= f.number_field :discount_amount, step: 0.01, min: 0, class: "input-field w-full" %></div>
+      <div class="sm:col-span-2"><%= f.label :notes, class: "mb-1 block text-sm font-medium" %><%= f.text_field :notes, class: "input-field w-full" %></div>
+    </div>
+    <p class="mt-3 text-xs text-gray-500">Discount is applied to the parts/labour subtotal (GST-inclusive) when you issue the tax invoice.</p>
+  </div>
+
+  <div class="flex gap-3">
+    <%= f.submit counter_invoice.persisted? ? "Update bill" : "Open bill", class: "btn-primary cursor-pointer" %>
+    <%= link_to "Cancel", counter_invoice.persisted? ? admin_counter_invoice_path(counter_invoice) : admin_counter_invoices_path, class: "btn-secondary" %>
+  </div>
+<% end %>

@@ -2,7 +2,7 @@
 
 module Admin
   class AccessoriesController < BaseController
-    before_action :set_accessory, only: %i[show edit update destroy]
+    before_action :set_accessory, only: %i[show edit update destroy bill_on_counter]
 
     def index
       authorize Accessory
@@ -52,6 +52,18 @@ module Admin
       redirect_to admin_accessories_path, notice: "Accessory was successfully deleted."
     end
 
+    def bill_on_counter
+      authorize @accessory, :bill_on_counter?
+
+      result = Billing::StartCounterInvoiceFromAccessoryService.new(@accessory, bill_on_counter_params).call
+      if result[:success]
+        redirect_to admin_counter_invoice_path(result[:invoice]),
+                    notice: "Spare bill opened with #{@accessory.name}. Confirm the customer, then issue the tax invoice."
+      else
+        redirect_to admin_accessory_path(@accessory), alert: result[:error]
+      end
+    end
+
     private
 
     def set_accessory
@@ -59,7 +71,11 @@ module Admin
     end
 
     def accessory_params
-      params.require(:accessory).permit(:name, :description, :price, :stock, :status, :image)
+      params.require(:accessory).permit(:name, :description, :price, :stock, :status, :image, :hsn_code, :gst_rate)
+    end
+
+    def bill_on_counter_params
+      params.permit(:customer_name, :phone, :quantity)
     end
   end
 end

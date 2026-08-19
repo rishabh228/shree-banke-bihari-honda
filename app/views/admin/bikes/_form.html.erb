@@ -30,6 +30,14 @@
         <%= f.label :status, class: "mb-1 block text-sm font-medium text-gray-700" %>
         <%= f.select :status, Bike.statuses.keys.map { |s| [s.humanize.titleize, s] }, {}, class: "input-field" %>
       </div>
+      <div>
+        <%= f.label :hsn_code, "HSN code", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :hsn_code, class: "input-field", placeholder: "8711" %>
+      </div>
+      <div>
+        <%= f.label :gst_rate, "GST % (on ex-showroom)", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.number_field :gst_rate, step: 0.01, class: "input-field" %>
+      </div>
       <div class="md:col-span-2">
         <%= f.label :description, class: "mb-1 block text-sm font-medium text-gray-700" %>
         <%= f.text_area :description, rows: 4, class: "input-field" %>

@@ -30,6 +30,14 @@
         <%= f.label :status, class: "mb-1 block text-sm font-medium text-gray-700" %>
         <%= f.select :status, Accessory.statuses.keys.map { |s| [s.humanize.titleize, s] }, {}, class: "input-field" %>
       </div>
+      <div>
+        <%= f.label :hsn_code, "HSN", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :hsn_code, class: "input-field", placeholder: "871410" %>
+      </div>
+      <div>
+        <%= f.label :gst_rate, "GST %", class: "mb-1 block text-sm font-medium text-gray-700" %>
+        <%= f.number_field :gst_rate, step: 0.01, min: 0, class: "input-field" %>
+      </div>
       <div class="md:col-span-2">
         <%= f.label :image, class: "mb-1 block text-sm font-medium text-gray-700" %>
         <% if accessory.image.attached? %>
@@ -42,6 +50,6 @@
 
   <div class="flex items-center gap-3">
     <%= f.submit class: "btn-primary cursor-pointer" %>
-    <%= link_to "Cancel", admin_accessories_path, class: "btn-secondary" %>
+    <%= link_to "Cancel", accessory.persisted? ? admin_accessory_path(accessory) : admin_accessories_path, class: "btn-secondary" %>
   </div>
 <% end %>

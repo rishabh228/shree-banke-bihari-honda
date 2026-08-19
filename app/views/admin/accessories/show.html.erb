@@ -1,0 +1,55 @@
+<% content_for :page_title, @accessory.name %>
+<% content_for :page_subtitle, "Accessory / spare" %>
+
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <%= render "shared/status_badge", status: @accessory.status %>
+  <div class="flex flex-wrap gap-2">
+    <%= link_to "Edit", edit_admin_accessory_path(@accessory), class: "btn-secondary" %>
+    <%= link_to "Back", admin_accessories_path, class: "btn-secondary" %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <div class="lg:col-span-2 card p-6">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Details</h2>
+    <div class="mt-4 flex items-start gap-4">
+      <% if @accessory.image.attached? %>
+        <%= image_tag @accessory.image, class: "h-24 w-24 rounded-lg object-cover" %>
+      <% end %>
+      <dl class="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2">
+        <div><dt class="text-xs text-gray-500">Name</dt><dd class="text-sm font-medium"><%= @accessory.name %></dd></div>
+        <div><dt class="text-xs text-gray-500">Price (GST inclusive)</dt><dd class="text-sm font-medium"><%= format_price(@accessory.price) %></dd></div>
+        <div><dt class="text-xs text-gray-500">Stock</dt><dd class="text-sm font-medium"><%= @accessory.stock %></dd></div>
+        <div><dt class="text-xs text-gray-500">HSN / GST</dt><dd class="text-sm font-medium"><%= @accessory.hsn %> · <%= @accessory.tax_rate.to_f %>%</dd></div>
+      </dl>
+    </div>
+    <% if @accessory.description.present? %>
+      <div class="mt-6 border-t border-gray-200 pt-4">
+        <dt class="text-xs text-gray-500">Description</dt>
+        <dd class="mt-2 text-sm text-gray-700"><%= simple_format @accessory.description %></dd>
+      </div>
+    <% end %>
+  </div>
+
+  <% if policy(@accessory).bill_on_counter? %>
+    <div class="card p-6">
+      <h2 class="font-display text-lg font-semibold text-honda-dark">Bill on spare counter</h2>
+      <p class="mt-1 text-sm text-gray-500">Opens a draft walk-in tax invoice with this part already added. Stock is deducted only when you issue the bill.</p>
+      <%= form_with url: bill_on_counter_admin_accessory_path(@accessory), method: :post, class: "mt-4 space-y-3" do %>
+        <div>
+          <label class="mb-1 block text-xs font-medium text-gray-500" for="customer_name">Customer name</label>
+          <input type="text" name="customer_name" id="customer_name" value="Walk-in customer" class="input-field w-full" required>
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-medium text-gray-500" for="phone">Phone</label>
+          <input type="tel" name="phone" id="phone" class="input-field w-full">
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-medium text-gray-500" for="quantity">Qty</label>
+          <input type="number" name="quantity" id="quantity" value="1" min="1" class="input-field w-full">
+        </div>
+        <%= submit_tag "Open spare bill", class: "btn-primary w-full cursor-pointer" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

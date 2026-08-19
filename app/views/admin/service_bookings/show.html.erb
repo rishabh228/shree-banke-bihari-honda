@@ -53,3 +53,97 @@
     </div>
   </div>
 </div>
+
+<div class="mt-6 card p-6">
+  <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <h2 class="font-display text-lg font-semibold text-honda-dark">Job card & workshop bill</h2>
+    <div class="flex flex-wrap gap-2">
+      <%= link_to "Job card PDF", job_card_pdf_admin_service_booking_path(@service_booking), class: "btn-secondary", data: { turbo: false } %>
+      <% if @service_booking.workshop_invoice&.issued? %>
+        <%= link_to "Invoice original", workshop_invoice_pdf_admin_service_booking_path(@service_booking, copy: "original"), class: "btn-primary", data: { turbo: false } %>
+        <%= link_to "Duplicate", workshop_invoice_pdf_admin_service_booking_path(@service_booking, copy: "duplicate"), class: "btn-secondary", data: { turbo: false } %>
+        <%= link_to "Triplicate", workshop_invoice_pdf_admin_service_booking_path(@service_booking, copy: "triplicate"), class: "btn-secondary", data: { turbo: false } %>
+      <% elsif policy(@service_booking).issue_workshop_invoice? %>
+        <%= button_to "Issue workshop tax invoice", issue_workshop_invoice_admin_service_booking_path(@service_booking), method: :post, class: "btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+
+  <%= form_with url: update_job_card_admin_service_booking_path(@service_booking), method: :patch, class: "mb-6 grid grid-cols-1 gap-3 sm:grid-cols-4" do %>
+    <div>
+      <label class="mb-1 block text-xs text-gray-500">KM reading</label>
+      <%= number_field_tag "job_card[km_reading]", @job_card&.km_reading, min: 0, class: "input-field w-full" %>
+    </div>
+    <div>
+      <label class="mb-1 block text-xs text-gray-500">Chassis</label>
+      <%= text_field_tag "job_card[chassis_number]", @job_card&.chassis_number, class: "input-field w-full" %>
+    </div>
+    <div>
+      <label class="mb-1 block text-xs text-gray-500">Engine</label>
+      <%= text_field_tag "job_card[engine_number]", @job_card&.engine_number, class: "input-field w-full" %>
+    </div>
+    <div class="flex items-end"><%= submit_tag @job_card ? "Save job card" : "Open job card", class: "btn-secondary cursor-pointer w-full" %></div>
+  <% end %>
+
+  <% if @job_card %>
+    <p class="mb-3 text-sm text-gray-500">Job card <%= @job_card.job_card_number %> · <%= @job_card.status.humanize %> · estimate <%= format_amount(@job_card.estimate_total) %></p>
+    <% if @job_card.lines.any? %>
+      <div class="mb-4 overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-3 py-2 text-left text-xs font-semibold uppercase text-gray-500">Type</th>
+              <th class="px-3 py-2 text-left text-xs font-semibold uppercase text-gray-500">Description</th>
+              <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500">Qty</th>
+              <th class="px-3 py-2 text-right text-xs font-semibold uppercase text-gray-500">Amount</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <% @job_card.lines.each do |line| %>
+              <tr>
+                <td class="px-3 py-2"><%= line.line_type.humanize %></td>
+                <td class="px-3 py-2 font-medium"><%= line.description %></td>
+                <td class="px-3 py-2 text-right"><%= line.quantity %> <%= line.uqc %></td>
+                <td class="px-3 py-2 text-right"><%= format_amount(line.line_total) %></td>
+                <td class="px-3 py-2 text-right">
+                  <% unless @job_card.billed? %>
+                    <%= button_to "Remove", admin_service_booking_job_card_line_path(@service_booking, line), method: :delete, class: "text-xs text-red-600" %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+
+    <% unless @job_card.billed? %>
+      <%= form_with model: @job_card_line, url: admin_service_booking_job_card_lines_path(@service_booking), class: "grid grid-cols-1 gap-3 border-t border-gray-100 pt-4 sm:grid-cols-6" do |f| %>
+        <div>
+          <%= f.label :line_type, class: "mb-1 block text-xs text-gray-500" %>
+          <%= f.select :line_type, [ [ "Part", "part" ], [ "Labour", "labour" ] ], {}, class: "input-field w-full" %>
+        </div>
+        <div class="sm:col-span-2">
+          <%= f.label :accessory_id, "From stock", class: "mb-1 block text-xs text-gray-500" %>
+          <%= f.collection_select :accessory_id, @accessories, :id, :name, { include_blank: "Custom" }, class: "input-field w-full" %>
+        </div>
+        <div>
+          <%= f.label :description, class: "mb-1 block text-xs text-gray-500" %>
+          <%= f.text_field :description, class: "input-field w-full", placeholder: "Oil change / pad" %>
+        </div>
+        <div>
+          <%= f.label :quantity, class: "mb-1 block text-xs text-gray-500" %>
+          <%= f.number_field :quantity, min: 0.01, step: 0.01, class: "input-field w-full" %>
+        </div>
+        <div>
+          <%= f.label :unit_price, "Unit (incl. GST)", class: "mb-1 block text-xs text-gray-500" %>
+          <%= f.number_field :unit_price, step: 0.01, min: 0, class: "input-field w-full" %>
+        </div>
+        <div class="sm:col-span-6"><%= f.submit "Add to job card", class: "btn-primary cursor-pointer" %></div>
+      <% end %>
+    <% end %>
+  <% else %>
+    <p class="text-sm text-gray-500">Save KM / chassis to open a numbered job card, then add parts and labour.</p>
+  <% end %>
+</div>

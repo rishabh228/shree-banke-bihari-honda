@@ -1,0 +1,6 @@
+<% content_for :page_title, "New service booking" %>
+<% content_for :page_subtitle, "Walk-in or phone appointment" %>
+
+<p class="mb-6 max-w-2xl text-sm text-gray-600">Use this for customers who call or walk into the workshop. Website bookings still appear here automatically. After saving, open the booking to create the job card and workshop tax invoice.</p>
+
+<%= render "form", service_booking: @service_booking, service_advisors: @service_advisors, show_status: false %>

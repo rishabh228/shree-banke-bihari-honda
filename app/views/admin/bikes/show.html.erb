@@ -31,7 +31,7 @@
       <% end %>
 
       <dl class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
-        <% { "Engine" => @bike.engine, "Mileage" => @bike.mileage, "Power" => @bike.power, "Torque" => @bike.torque, "Fuel Tank" => @bike.fuel_tank, "Weight" => @bike.weight }.each do |label, value| %>
+        <% { "Engine" => @bike.engine, "Mileage" => @bike.mileage, "Power" => @bike.power, "Torque" => @bike.torque, "Fuel Tank" => @bike.fuel_tank, "Weight" => @bike.weight, "HSN" => @bike.hsn, "GST" => "#{@bike.tax_rate.to_f}%" }.each do |label, value| %>
           <div>
             <dt class="text-xs font-medium uppercase tracking-wider text-gray-500"><%= label %></dt>
             <dd class="mt-1 text-sm font-medium text-honda-dark"><%= value.presence || "—" %></dd>

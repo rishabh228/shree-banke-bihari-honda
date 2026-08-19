@@ -4,16 +4,10 @@
   <div class="h-1 bg-gradient-to-r from-honda-red via-honda-red to-honda-gold"></div>
 
   <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Main navigation">
-    <div class="flex h-16 items-center justify-between gap-4 lg:h-[4.5rem]">
+    <div class="flex h-[4.5rem] items-center justify-between gap-4 lg:h-20">
       <%# Logo %>
       <%= link_to root_path, class: "group flex shrink-0 items-center gap-3" do %>
-        <% if current_settings.logo.attached? %>
-          <%= image_tag current_settings.logo, alt: current_settings.showroom_name, class: "h-10 w-auto object-contain lg:h-11" %>
-        <% else %>
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-honda-red text-sm font-bold text-white shadow-sm lg:h-11 lg:w-11 lg:text-base">
-            H
-          </div>
-        <% end %>
+        <%= showroom_logo_tag(html_class: "h-11 w-auto object-contain lg:h-12") %>
         <div class="hidden sm:block">
           <p class="font-display text-base font-bold leading-tight text-honda-dark group-hover:text-honda-red lg:text-lg"><%= current_settings.showroom_name %></p>
           <p class="text-xs font-medium uppercase tracking-wider text-honda-red">Authorized Honda Dealer</p>
@@ -30,6 +24,7 @@
           [ "Finance", finance_path ],
           [ "Insurance", insurance_path ],
           [ "Service", new_service_booking_path ],
+          [ "Gallery", gallery_path ],
           [ "About", about_path ],
           [ "Contact", contact_path ]
         ].each do |label, path| %>
@@ -88,6 +83,7 @@
           [ "Finance", finance_path ],
           [ "Insurance", insurance_path ],
           [ "Book Service", new_service_booking_path ],
+          [ "Gallery", gallery_path ],
           [ "About Us", about_path ],
           [ "Contact", contact_path ]
         ].each do |label, path| %>

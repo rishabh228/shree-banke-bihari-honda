@@ -47,6 +47,6 @@
 
   <div class="flex items-center gap-3">
     <%= f.submit class: "btn-primary cursor-pointer" %>
-    <%= link_to "Cancel", admin_banners_path, class: "btn-secondary" %>
+    <%= link_to "Cancel", banner.persisted? ? admin_banner_path(banner) : admin_banners_path, class: "btn-secondary" %>
   </div>
 <% end %>

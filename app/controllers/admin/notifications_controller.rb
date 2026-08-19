@@ -22,7 +22,14 @@ module Admin
       authorize Notification, :mark_all_read?
 
       current_user.notifications.unread.update_all(read_at: Time.current)
+      Notification.broadcast_unread_count_for(current_user)
       redirect_to admin_notifications_path, notice: "All notifications marked as read."
+    end
+
+    def unread_count
+      authorize Notification, :unread_count?
+
+      render json: { count: current_user.notifications.unread.count }
     end
   end
 end

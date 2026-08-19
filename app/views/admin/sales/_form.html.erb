@@ -40,14 +40,17 @@
   <div class="card p-6">
     <h2 class="font-display mb-4 text-lg font-semibold text-honda-dark">Pricing</h2>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <div><%= f.label :ex_showroom_price, "Ex-Showroom", class: "mb-1 block text-sm font-medium" %><%= f.number_field :ex_showroom_price, step: 1, class: "input-field w-full" %></div>
-      <div><%= f.label :insurance, class: "mb-1 block text-sm font-medium" %><%= f.number_field :insurance, step: 1, class: "input-field w-full" %></div>
-      <div><%= f.label :rto, class: "mb-1 block text-sm font-medium" %><%= f.number_field :rto, step: 1, class: "input-field w-full" %></div>
-      <div><%= f.label :other_charges, "Other Charges", class: "mb-1 block text-sm font-medium" %><%= f.number_field :other_charges, step: 1, class: "input-field w-full" %></div>
+      <div><%= f.label :ex_showroom_price, "Ex-Showroom (incl. GST)", class: "mb-1 block text-sm font-medium" %><%= f.number_field :ex_showroom_price, step: 1, class: "input-field w-full" %></div>
+      <div><%= f.label :insurance, "Insurance (collected)", class: "mb-1 block text-sm font-medium" %><%= f.number_field :insurance, step: 1, class: "input-field w-full" %></div>
+      <div><%= f.label :rto, "RTO (collected)", class: "mb-1 block text-sm font-medium" %><%= f.number_field :rto, step: 1, class: "input-field w-full" %></div>
+      <div><%= f.label :handling_charge, "Handling / documentation", class: "mb-1 block text-sm font-medium" %><%= f.number_field :handling_charge, step: 1, class: "input-field w-full" %></div>
+      <div><%= f.label :accessories_charge, "Accessories pack", class: "mb-1 block text-sm font-medium" %><%= f.number_field :accessories_charge, step: 1, class: "input-field w-full" %></div>
+      <div><%= f.label :discount_percent, "Discount % (on ex-showroom)", class: "mb-1 block text-sm font-medium" %><%= f.number_field :discount_percent, step: 0.01, min: 0, max: 100, class: "input-field w-full" %></div>
+      <div><%= f.label :discount_amount, "Extra discount (₹)", class: "mb-1 block text-sm font-medium" %><%= f.number_field :discount_amount, step: 1, min: 0, class: "input-field w-full" %></div>
       <div><%= f.label :total_price, "Total On-Road", class: "mb-1 block text-sm font-medium" %><%= f.number_field :total_price, step: 1, class: "input-field w-full" %></div>
       <div><%= f.label :booking_amount, "Booking Amount", class: "mb-1 block text-sm font-medium" %><%= f.number_field :booking_amount, step: 1, class: "input-field w-full" %></div>
     </div>
-    <p class="mt-2 text-xs text-gray-500">Select a variant to auto-fill prices on save, or enter manually.</p>
+    <p class="mt-2 text-xs text-gray-500">Selecting a variant fills prices once. Discount % and extra ₹ come off ex-showroom (before GST split). Total on-road is recalculated from discounted ex-showroom + insurance + RTO + handling + accessories pack + accessory lines.</p>
   </div>
 
   <div class="card p-6">
@@ -61,6 +64,19 @@
       <div><%= f.label :chassis_number, class: "mb-1 block text-sm font-medium" %><%= f.text_field :chassis_number, class: "input-field w-full" %></div>
       <div><%= f.label :engine_number, class: "mb-1 block text-sm font-medium" %><%= f.text_field :engine_number, class: "input-field w-full" %></div>
       <div class="sm:col-span-2"><%= f.label :notes, class: "mb-1 block text-sm font-medium" %><%= f.text_area :notes, rows: 3, class: "input-field w-full" %></div>
+    </div>
+    <p class="mt-2 text-xs text-gray-500">Prefer allotting a chassis from stock on the sale page. Manual chassis/engine is allowed for legacy punching.</p>
+  </div>
+
+  <div class="card p-6">
+    <h2 class="font-display mb-4 text-lg font-semibold text-honda-dark">Buyer tax & finance</h2>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div><%= f.label :buyer_gstin, "Buyer GSTIN (B2B)", class: "mb-1 block text-sm font-medium" %><%= f.text_field :buyer_gstin, class: "input-field w-full", maxlength: 15 %></div>
+      <div><%= f.label :buyer_pan, "Buyer PAN", class: "mb-1 block text-sm font-medium" %><%= f.text_field :buyer_pan, class: "input-field w-full", maxlength: 10 %></div>
+      <div><%= f.label :buyer_state, class: "mb-1 block text-sm font-medium" %><%= f.text_field :buyer_state, class: "input-field w-full", placeholder: "Leave blank for same state as showroom" %></div>
+      <div><%= f.label :buyer_state_code, "Buyer GST state code", class: "mb-1 block text-sm font-medium" %><%= f.text_field :buyer_state_code, class: "input-field w-full", maxlength: 2, placeholder: "09" %></div>
+      <div><%= f.label :loan_amount, class: "mb-1 block text-sm font-medium" %><%= f.number_field :loan_amount, step: 1, class: "input-field w-full" %></div>
+      <div><%= f.label :down_payment, class: "mb-1 block text-sm font-medium" %><%= f.number_field :down_payment, step: 1, class: "input-field w-full" %></div>
     </div>
   </div>
 

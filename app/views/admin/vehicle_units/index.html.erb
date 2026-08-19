@@ -1,0 +1,71 @@
+<% content_for :page_title, "Chassis Stock" %>
+<% content_for :page_subtitle, "Frame-wise inventory for allotment and invoicing" %>
+
+<% current_status = params.dig(:q, :status_eq) %>
+<div class="mb-4 flex flex-wrap gap-2">
+  <%= link_to "All", admin_vehicle_units_path, class: "rounded-full px-4 py-1.5 text-sm font-medium #{current_status.blank? ? 'bg-honda-red text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
+  <% VehicleUnit.statuses.each do |key, value| %>
+    <%= link_to key.humanize.titleize, admin_vehicle_units_path(q: { status_eq: value }),
+          class: "rounded-full px-4 py-1.5 text-sm font-medium #{current_status.to_s == value.to_s ? 'bg-honda-red text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
+  <% end %>
+</div>
+
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+  <%= search_form_for @q, url: admin_vehicle_units_path, class: "flex flex-wrap items-end gap-3" do |f| %>
+    <%= f.hidden_field :status_eq if current_status.present? %>
+    <div>
+      <%= f.label :chassis_number_cont, "Chassis", class: "mb-1 block text-xs font-medium text-gray-500" %>
+      <%= f.search_field :chassis_number_cont, class: "input-field w-44", placeholder: "Chassis no..." %>
+    </div>
+    <div class="flex gap-2">
+      <%= f.submit "Search", class: "btn-primary" %>
+      <%= link_to "Reset", admin_vehicle_units_path, class: "btn-secondary" %>
+    </div>
+  <% end %>
+  <%= link_to "Add Chassis", new_admin_vehicle_unit_path, class: "btn-primary shrink-0" %>
+</div>
+
+<% if @vehicle_units.any? %>
+  <div class="card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Chassis</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Engine</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Variant</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-500">Sale</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <% @vehicle_units.each do |unit| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 text-sm font-medium text-honda-dark"><%= unit.chassis_number %></td>
+              <td class="px-6 py-4 text-sm text-gray-700"><%= unit.engine_number %></td>
+              <td class="px-6 py-4 text-sm text-gray-700">
+                <%= unit.bike_variant.bike.name %>
+                <div class="text-xs text-gray-500"><%= [ unit.bike_variant.name, unit.bike_variant.color ].compact.join(" · ") %></div>
+              </td>
+              <td class="px-6 py-4"><%= render "shared/status_badge", status: unit.status %></td>
+              <td class="px-6 py-4 text-sm">
+                <% if unit.sale %>
+                  <%= link_to unit.sale.customer_name, admin_sale_path(unit.sale), class: "font-semibold text-honda-red" %>
+                <% else %>
+                  <span class="text-gray-400">—</span>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 text-right text-sm">
+                <%= link_to "View", admin_vehicle_unit_path(unit), class: "font-semibold text-honda-red hover:text-red-700" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% if @pagy.pages > 1 %><div class="mt-6 flex justify-center"><%== pagy_nav(@pagy) %></div><% end %>
+<% else %>
+  <%= render "shared/empty_state", title: "No chassis in stock", message: "Add frame and engine numbers as vehicles arrive from the distributor.", cta_text: "Add Chassis", cta_path: new_admin_vehicle_unit_path %>
+<% end %>

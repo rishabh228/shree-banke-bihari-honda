@@ -75,7 +75,8 @@ module Reports
       def render_terms(pdf)
         pdf.text "Terms & Conditions", size: 10, style: :bold
         pdf.move_down 4
-        pdf.text "Prices are indicative and subject to change. Booking amount is non-refundable as per showroom policy. " \
+        pdf.text "This document is a quotation / sale summary, not a GST tax invoice. " \
+                 "Prices are indicative and subject to change. Booking amount is non-refundable as per showroom policy. " \
                  "Delivery timeline depends on stock availability and RTO processing.",
                  size: 9, color: "666666"
       end
