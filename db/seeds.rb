@@ -286,8 +286,6 @@ if rahul
   end
 end
 
-end
-
 enquiry_bike = Bike.published_bikes.first
 if enquiry_bike
   Enquiry.find_or_create_by!(phone: "9000000001", source: :bike_enquiry) do |enquiry|
