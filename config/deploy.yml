@@ -1,7 +1,4 @@
-# Oracle Always Free deploy.
-# After the VM exists, replace PASTE_ORACLE_IP with the public IPv4, e.g. 140.238.10.20
-# For proxy.host and APP_HOST, change dots to hyphens: 140-238-10-20.sslip.io
-#
+# Oracle Always Free — Mumbai Ampere Ubuntu 22.04
 # Dummy db/seeds.rb is never run in production.
 service: shree_banke_bihari_honda
 
@@ -9,11 +6,11 @@ image: rishubhlodhi121/shree_banke_bihari_honda
 
 servers:
   web:
-    - PASTE_ORACLE_IP
+    - 152.67.9.50
 
 proxy:
   ssl: true
-  host: PASTE-HYPHEN-IP.sslip.io
+  host: 152-67-9-50.sslip.io
 
 registry:
   username: rishubhlodhi121
@@ -24,7 +21,7 @@ env:
   secret:
     - RAILS_MASTER_KEY
   clear:
-    APP_HOST: PASTE-HYPHEN-IP.sslip.io
+    APP_HOST: 152-67-9-50.sslip.io
     SOLID_QUEUE_IN_PUMA: true
 
 aliases:
@@ -38,10 +35,9 @@ volumes:
 
 asset_path: /rails/public/assets
 
-# Always Free Ampere is ARM. Build on the Oracle VM, not on your laptop.
 builder:
   arch: arm64
-  remote: ssh://ubuntu@PASTE_ORACLE_IP
+  remote: ssh://ubuntu@152.67.9.50
 
 ssh:
   user: ubuntu
