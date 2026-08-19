@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+# Local demo data only. Production must not run this file.
+if Rails.env.production?
+  abort "Refusing dummy seeds in production. Create the first admin with: bin/rails production:create_admin"
+end
+
 # Shree Banke Bihari Honda — Seed Data
 puts "Seeding Shree Banke Bihari Honda..."
 

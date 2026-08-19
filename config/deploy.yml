@@ -1,4 +1,9 @@
-# Name of your application. Used to uniquely configure containers.
+# Replace the three placeholders before the first deploy:
+#   1. image / registry.username  -> your Docker Hub username
+#   2. servers.web                -> VPS public IP
+#   3. proxy.host and APP_HOST    -> live domain (no https://)
+#
+# Dummy db/seeds.rb is never run in production.
 service: shree_banke_bihari_honda
 
 # Name of the container image.
@@ -36,6 +41,9 @@ env:
   secret:
     - RAILS_MASTER_KEY
   clear:
+    # Public hostname (no https://). Must match proxy.host and DNS A record.
+    APP_HOST: app.example.com
+
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
     SOLID_QUEUE_IN_PUMA: true
