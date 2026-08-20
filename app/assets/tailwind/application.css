@@ -65,4 +65,12 @@
   main table {
     @apply w-full text-left text-sm;
   }
+
+  .admin-menu-summary {
+    list-style: none;
+  }
+
+  .admin-menu-summary::-webkit-details-marker {
+    display: none;
+  }
 }

@@ -54,14 +54,16 @@
         <p class="text-xs text-honda-gold">Admin Panel</p>
       </div>
     </div>
-    <button type="button"
-            data-action="click->admin-sidebar#close"
-            class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white lg:hidden"
-            aria-label="Close menu">
-      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-      </svg>
-    </button>
+    <% if local_assigns[:show_close] %>
+      <button type="button"
+              class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white"
+              aria-label="Close menu"
+              onclick="this.closest('details').removeAttribute('open')">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    <% end %>
   </div>
 
   <%# Navigation %>
@@ -86,7 +88,7 @@
             <li>
               <%= link_to item[:path],
                     class: "admin-nav-link #{active ? 'admin-nav-link-active' : ''}",
-                    data: { action: "click->admin-sidebar#close" } do %>
+                    onclick: (local_assigns[:show_close] ? "this.closest('details')?.removeAttribute('open')" : nil) do %>
                 <svg class="h-5 w-5 shrink-0 <%= active ? 'text-honda-red' : 'text-gray-400' %>" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="<%= item[:icon] %>"/>
                 </svg>
