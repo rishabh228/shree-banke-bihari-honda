@@ -1,16 +1,18 @@
 <%# Public navigation — sticky header with mobile drawer %>
-<header class="sticky top-0 z-50 border-b border-gray-200/80 bg-white/95 shadow-sm backdrop-blur-md">
+<header class="sticky top-0 z-50 border-b border-gray-200/80 bg-white/95 shadow-sm backdrop-blur-md"
+        data-controller="mobile-nav"
+        data-action="turbo:before-cache@window->mobile-nav#close">
   <%# Top accent bar %>
   <div class="h-1 bg-gradient-to-r from-honda-red via-honda-red to-honda-gold"></div>
 
   <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Main navigation">
     <div class="flex h-[4.5rem] items-center justify-between gap-4 lg:h-20">
       <%# Logo %>
-      <%= link_to root_path, class: "group flex shrink-0 items-center gap-3" do %>
-        <%= showroom_logo_tag(html_class: "h-11 w-auto object-contain lg:h-12") %>
-        <div class="hidden sm:block">
-          <p class="font-display text-base font-bold leading-tight text-honda-dark group-hover:text-honda-red lg:text-lg"><%= current_settings.showroom_name %></p>
-          <p class="text-xs font-medium uppercase tracking-wider text-honda-red">Authorized Honda Dealer</p>
+      <%= link_to root_path, class: "group flex min-w-0 shrink items-center gap-2 sm:gap-3" do %>
+        <%= showroom_logo_tag(html_class: "h-9 w-auto object-contain sm:h-11 lg:h-12") %>
+        <div class="min-w-0">
+          <p class="truncate font-display text-sm font-bold leading-tight text-honda-dark group-hover:text-honda-red sm:text-base lg:text-lg"><%= current_settings.showroom_name %></p>
+          <p class="hidden text-xs font-medium uppercase tracking-wider text-honda-red sm:block">Authorized Honda Dealer</p>
         </div>
       <% end %>
 
@@ -53,10 +55,9 @@
         <% end %>
 
         <button type="button"
-                data-controller="mobile-nav"
-                data-action="mobile-nav#toggle"
+                data-action="click->mobile-nav#toggle"
                 data-mobile-nav-target="toggle"
-                class="inline-flex items-center justify-center rounded-lg p-2 text-gray-600 hover:bg-gray-100 hover:text-honda-dark xl:hidden"
+                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg p-2 text-gray-600 hover:bg-gray-100 hover:text-honda-dark xl:hidden"
                 aria-expanded="false"
                 aria-controls="mobile-menu"
                 aria-label="Open menu">
@@ -70,10 +71,10 @@
       </div>
     </div>
 
-    <%# Mobile menu %>
+    <%# Mobile menu — must live inside the mobile-nav controller (the header) %>
     <div id="mobile-menu"
          data-mobile-nav-target="menu"
-         class="hidden border-t border-gray-100 pb-4 xl:hidden">
+         class="hidden max-h-[min(80vh,32rem)] overflow-y-auto border-t border-gray-100 bg-white pb-4 xl:hidden">
       <div class="grid gap-1 pt-3 sm:grid-cols-2">
         <% [
           [ "Home", root_path ],
@@ -88,11 +89,12 @@
           [ "Contact", contact_path ]
         ].each do |label, path| %>
           <%= link_to label, path,
-                class: "rounded-lg px-4 py-2.5 text-sm font-medium #{public_nav_active?(path) ? 'bg-red-50 text-honda-red' : 'text-gray-700 hover:bg-gray-50'}" %>
+                class: "rounded-lg px-4 py-3 text-sm font-medium #{public_nav_active?(path) ? 'bg-red-50 text-honda-red' : 'text-gray-700 hover:bg-gray-50'}",
+                data: { action: "click->mobile-nav#close" } %>
         <% end %>
       </div>
       <div class="mt-3 px-2">
-        <%= link_to new_test_ride_path, class: "btn-primary w-full justify-center py-3" do %>
+        <%= link_to new_test_ride_path, class: "btn-primary w-full justify-center py-3", data: { action: "click->mobile-nav#close" } do %>
           Book Test Ride
         <% end %>
       </div>

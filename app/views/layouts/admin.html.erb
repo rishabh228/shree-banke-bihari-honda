@@ -2,7 +2,7 @@
 <html lang="en" class="h-full">
   <head>
     <title><%= content_for(:title) ? "#{content_for(:title)} | Admin" : "Admin | #{current_settings.showroom_name}" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -20,43 +20,44 @@
   </head>
 
   <body class="h-full bg-gray-100 font-sans text-honda-dark antialiased">
-    <div class="flex h-full min-h-screen" data-controller="admin-sidebar">
+    <div class="flex min-h-dvh min-h-screen" data-controller="admin-sidebar">
       <%# Mobile overlay %>
       <div data-admin-sidebar-target="overlay"
            data-action="click->admin-sidebar#close"
-           class="fixed inset-0 z-40 hidden bg-honda-dark/60 backdrop-blur-sm lg:hidden"></div>
+           class="fixed inset-0 z-[60] hidden bg-honda-dark/60 backdrop-blur-sm lg:hidden"></div>
 
       <%# Sidebar %>
       <aside data-admin-sidebar-target="sidebar"
-             class="fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col bg-honda-dark transition-transform duration-300 lg:static lg:translate-x-0">
+             class="fixed inset-y-0 left-0 z-[70] flex w-[min(18rem,88vw)] -translate-x-full flex-col bg-honda-dark transition-transform duration-300 ease-out lg:static lg:z-auto lg:w-72 lg:translate-x-0">
         <%= render "shared/admin_sidebar" %>
       </aside>
 
       <%# Main content %>
       <div class="flex min-w-0 flex-1 flex-col">
-        <%# Top bar %>
-        <header class="sticky top-0 z-30 border-b border-gray-200 bg-white shadow-sm">
-          <div class="flex h-16 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center gap-3">
+        <%# Top bar — min-height not fixed height so subtitle cannot overlap the form %>
+        <header class="sticky top-0 z-30 border-b border-gray-200 bg-white pt-[env(safe-area-inset-top)] shadow-sm">
+          <div class="flex items-center justify-between gap-2 px-3 py-2.5 sm:px-6 lg:px-8">
+            <div class="flex min-w-0 flex-1 items-center gap-2">
               <button type="button"
-                      data-action="admin-sidebar#toggle"
-                      class="inline-flex items-center justify-center rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-honda-dark lg:hidden"
-                      aria-label="Toggle sidebar">
+                      data-action="click->admin-sidebar#toggle"
+                      class="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-honda-dark lg:hidden"
+                      aria-label="Open menu"
+                      aria-expanded="false">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
                 </svg>
               </button>
-              <div>
-                <h1 class="font-display text-lg font-semibold text-honda-dark">
+              <div class="min-w-0">
+                <h1 class="truncate font-display text-base font-semibold text-honda-dark sm:text-lg">
                   <%= content_for(:page_title) || "Dashboard" %>
                 </h1>
                 <% if content_for?(:page_subtitle) %>
-                  <p class="text-sm text-gray-500"><%= content_for(:page_subtitle) %></p>
+                  <p class="truncate text-xs text-gray-500 sm:text-sm"><%= content_for(:page_subtitle) %></p>
                 <% end %>
               </div>
             </div>
 
-            <div class="flex items-center gap-3 sm:gap-4">
+            <div class="flex shrink-0 items-center gap-1 sm:gap-3">
               <%= link_to root_path, target: "_blank", rel: "noopener",
                     class: "hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100 hover:text-honda-red sm:inline-flex" do %>
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -67,7 +68,7 @@
 
               <%= render "shared/notification_bell", unread_count: @unread_notifications_count %>
 
-              <div class="flex items-center gap-3 border-l border-gray-200 pl-3 sm:pl-4">
+              <div class="flex items-center gap-2 border-l border-gray-200 pl-2 sm:gap-3 sm:pl-4">
                 <div class="hidden text-right sm:block">
                   <p class="text-sm font-semibold text-honda-dark"><%= current_user.name %></p>
                   <p class="text-xs text-gray-500"><%= current_user.display_role %></p>
@@ -88,7 +89,7 @@
         </header>
 
         <%# Page content %>
-        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <main class="min-w-0 flex-1 overflow-auto p-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6 lg:p-8">
           <%= render "shared/flash" %>
           <%= yield %>
         </main>

@@ -65,15 +65,15 @@
       <div class="mx-auto flex max-w-7xl items-center px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div class="max-w-2xl">
           <p class="text-sm font-semibold uppercase tracking-widest text-honda-gold">Authorized Honda Dealer</p>
-          <h1 class="mt-3 font-display text-4xl font-bold text-white sm:text-5xl lg:text-6xl">
+          <h1 class="mt-3 font-display text-3xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
             Ride the Future with <%= @settings.showroom_name %>
           </h1>
-          <p class="mt-6 text-lg leading-relaxed text-gray-300">
+          <p class="mt-4 text-base leading-relaxed text-gray-300 sm:mt-6 sm:text-lg">
             Explore our complete range of Honda motorcycles and scooters. Expert guidance, flexible finance, and world-class after-sales service — all under one roof.
           </p>
-          <div class="mt-10 flex flex-wrap gap-4">
-            <%= link_to "Browse Bikes", bikes_path, class: "btn-primary" %>
-            <%= link_to "Current Offers", offers_path, class: "btn-outline-light" %>
+          <div class="mt-8 flex w-full flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4">
+            <%= link_to "Browse Bikes", bikes_path, class: "btn-primary w-full justify-center sm:w-auto" %>
+            <%= link_to "Current Offers", offers_path, class: "btn-outline-light w-full justify-center sm:w-auto" %>
           </div>
         </div>
       </div>
